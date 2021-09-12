@@ -1,13 +1,17 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id 'java-library'
+    id 'java'
+    id 'maven-publish'
 }
 group 'apple.utilities'
 version '1.0.BUILD-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
+
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
