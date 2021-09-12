@@ -11,9 +11,11 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
-
-sourceCompatibility = 1.16
-targetCompatibility = 1.16
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
+}
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
