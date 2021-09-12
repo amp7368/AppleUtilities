@@ -1,0 +1,53 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'java'
+}
+
+group 'apple.utilities'
+version '1.0.BUILD-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+    implementation 'org.jetbrains:annotations:22.0.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'org.yaml:snakeyaml:1.29'
+}
+
+test {
+    useJUnitPlatform()
+}
+jar {
+}
+def filesToCopy = copySpec {
+    from jar.getArchiveFile()
+}
+
+task jarAndCopyFiles {
+    dependsOn(jar)
+    doLast {
+        ['C:\\Users\\Aaron\\Desktop\\Idea\\SpotifyAnalysis\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\CloverBot\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\BuildBot\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\Excursion\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Plugins\\Snowball\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Plugins\\Volts\\LoadDependencies\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Plugins\\Volts\\VoltskiyaGameMechanics\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Plugins\\Volts\\VoltskiyaAppleMisc\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Plugins\\Volts\\VoltskiyaUtilities\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\SpotifyAnalysis\\lib\\'
+        ].each { dest ->
+            {
+                copy {
+                    with filesToCopy
+                    into dest
+                }
+            }
+        }
+    }
+}
