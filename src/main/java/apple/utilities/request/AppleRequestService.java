@@ -6,6 +6,7 @@ import apple.utilities.structures.Pair;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class AppleRequestService implements AppleRequestQueue {
@@ -180,7 +181,15 @@ public abstract class AppleRequestService implements AppleRequestQueue {
         }
     }
 
-    public record RequestCalled(RequestHandler<?> request, long timeRequested) {
+    public static final class RequestCalled {
+        private final RequestHandler<?> request;
+        private final long timeRequested;
+
+        public RequestCalled(RequestHandler<?> request, long timeRequested) {
+            this.request = request;
+            this.timeRequested = timeRequested;
+        }
+
         public boolean isOld(int oldThreshold, long now) {
             return now > oldThreshold + timeRequested;
         }
@@ -188,5 +197,35 @@ public abstract class AppleRequestService implements AppleRequestQueue {
         public long timeUntilOld(long oldThreshold, long now) {
             return oldThreshold + timeRequested - now;
         }
+
+        public RequestHandler<?> request() {
+            return request;
+        }
+
+        public long timeRequested() {
+            return timeRequested;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (RequestCalled) obj;
+            return Objects.equals(this.request, that.request) &&
+                    this.timeRequested == that.timeRequested;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(request, timeRequested);
+        }
+
+        @Override
+        public String toString() {
+            return "RequestCalled[" +
+                    "request=" + request + ", " +
+                    "timeRequested=" + timeRequested + ']';
+        }
+
     }
 }

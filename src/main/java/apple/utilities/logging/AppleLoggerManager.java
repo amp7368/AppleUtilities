@@ -28,13 +28,24 @@ public class AppleLoggerManager {
 
     public void log(String message, Level level, AppleLoggerName... loggerNames) {
         BiConsumer<Logger, String> action;
-        action = switch (level) {
-            case TRACE -> Logger::trace;
-            case DEBUG -> Logger::debug;
-            case INFO -> Logger::info;
-            case WARN -> Logger::warn;
-            default -> Logger::error;
-        };
+        switch (level) {
+            case TRACE:
+                action = Logger::trace;
+                break;
+            case DEBUG:
+                action = Logger::debug;
+                break;
+            case INFO:
+                action = Logger::info;
+                break;
+            case WARN:
+                action = Logger::warn;
+                break;
+            default:
+                action = Logger::error;
+                break;
+        }
+        ;
         for (AppleLoggerName loggerName : loggerNames) {
             action.accept(loggers.computeIfAbsent(loggerName, (k) -> defaultLogger), message);
         }

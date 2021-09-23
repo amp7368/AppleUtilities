@@ -1,6 +1,7 @@
 package apple.utilities.util;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -90,7 +91,15 @@ public class NumberUtils {
     public interface Scoreable<T> extends IntSupplier, Supplier<T> {
     }
 
-    public record ScoreableSimple<T>(IntSupplier score, Supplier<T> giver) implements Scoreable<T> {
+    public static final class ScoreableSimple<T> implements Scoreable<T> {
+        private final IntSupplier score;
+        private final Supplier<T> giver;
+
+        public ScoreableSimple(IntSupplier score, Supplier<T> giver) {
+            this.score = score;
+            this.giver = giver;
+        }
+
         @Override
         public int getAsInt() {
             return score.getAsInt();
@@ -100,8 +109,75 @@ public class NumberUtils {
         public T get() {
             return giver.get();
         }
+
+        public IntSupplier score() {
+            return score;
+        }
+
+        public Supplier<T> giver() {
+            return giver;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            ScoreableSimple that = (ScoreableSimple) obj;
+            return Objects.equals(this.score, that.score) &&
+                    Objects.equals(this.giver, that.giver);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(score, giver);
+        }
+
+        @Override
+        public String toString() {
+            return "ScoreableSimple[" +
+                    "score=" + score + ", " +
+                    "giver=" + giver + ']';
+        }
+
     }
 
-    public record Scored<T>(int score, T val) {
+    public static final class Scored<T> {
+        private final int score;
+        private final T val;
+
+        public Scored(int score, T val) {
+            this.score = score;
+            this.val = val;
+        }
+
+        public int score() {
+            return score;
+        }
+
+        public T val() {
+            return val;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            Scored that = (Scored) obj;
+            return this.score == that.score &&
+                    Objects.equals(this.val, that.val);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(score, val);
+        }
+
+        @Override
+        public String toString() {
+            return "Scored[" +
+                    "score=" + score + ", " +
+                    "val=" + val + ']';
+        }
+
     }
 }
