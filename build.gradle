@@ -9,11 +9,8 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_1_8.getMajorVersion()))
-    }
-}
+project.targetCompatibility = JavaVersion.VERSION_1_8
+project.sourceCompatibility = JavaVersion.VERSION_1_8
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
     archiveClassifier = "sources"
