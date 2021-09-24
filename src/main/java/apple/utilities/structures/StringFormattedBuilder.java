@@ -2,10 +2,11 @@ package apple.utilities.structures;
 
 import apple.utilities.lamdas.ObjectSupplier;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class StringFormattedBuilder {
     private final List<Pair<Integer, String>> stringMatched;
@@ -15,11 +16,15 @@ public class StringFormattedBuilder {
     public StringFormattedBuilder(String string, ObjectSupplier... argsSupplier) {
         this.string = string.replace("%", "%%");
         this.argsSupplier = argsSupplier;
-        this.stringMatched = Pattern.compile("[{][0-9]*[}]")
-                .matcher(this.string).results()
-                .map(m -> new Pair<>(m.start(), m.group()))
-                .sorted(Comparator.comparingInt(Pair::getKey))
-                .collect(Collectors.toList());
+        MatchResult matchResult = Pattern.compile("[{][0-9]*[}]")
+                .matcher(this.string).toMatchResult();
+        List<Pair<Integer, String>> results = new ArrayList<>();
+        String result;
+        for (int i = 0; i < matchResult.groupCount(); i++) {
+            results.add(new Pair<>(matchResult.start(i), matchResult.group(i)));
+        }
+        results.sort(Comparator.comparingInt(Pair::getKey));
+        this.stringMatched = results;
     }
 
     public String getString() {

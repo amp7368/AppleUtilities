@@ -210,7 +210,7 @@ public abstract class AppleRequestService implements AppleRequestQueue {
         public boolean equals(Object obj) {
             if (obj == this) return true;
             if (obj == null || obj.getClass() != this.getClass()) return false;
-            var that = (RequestCalled) obj;
+            RequestCalled that = (RequestCalled) obj;
             return Objects.equals(this.request, that.request) &&
                     this.timeRequested == that.timeRequested;
         }

@@ -39,7 +39,8 @@ public class Pair<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Pair p) {
+        if (obj instanceof Pair) {
+            Pair p = (Pair) obj;
             return p.getKey().equals(key) && p.getValue().equals(value);
         }
         return false;

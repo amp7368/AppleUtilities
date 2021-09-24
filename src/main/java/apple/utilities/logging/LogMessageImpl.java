@@ -31,7 +31,7 @@ public final class LogMessageImpl implements LogMessage {
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (LogMessageImpl) obj;
+        LogMessageImpl that = (LogMessageImpl) obj;
         return Objects.equals(this.message, that.message) &&
                 Objects.equals(this.level, that.level) &&
                 Objects.equals(this.loggedNames, that.loggedNames);

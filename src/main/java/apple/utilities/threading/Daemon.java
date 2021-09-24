@@ -5,7 +5,7 @@ public interface Daemon {
         new Thread(this::init1).start();
     }
 
-    private void init1() {
+    default void init1() {
         onStart();
         if (isSleepFirst()) doSleep();
         while (true) {
@@ -20,7 +20,7 @@ public interface Daemon {
         onComplete();
     }
 
-    private boolean doSleep() {
+    default boolean doSleep() {
         try {
             Thread.sleep(getSleepMillis());
         } catch (InterruptedException e) {

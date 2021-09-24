@@ -18,8 +18,8 @@ public class ExceptionUnpackaging {
     public static Exception ignore(@NotNull Exception e, @NotNull Class<?>... ignored) {
         while (isType(ignored, e)) {
             Throwable cause = e.getCause();
-            if (cause instanceof Exception e1) {
-                e = e1;
+            if (cause instanceof Exception) {
+                e = (Exception) cause;
             } else {
                 return null;
             }
@@ -30,8 +30,8 @@ public class ExceptionUnpackaging {
     public static boolean exists(@NotNull Exception e, @NotNull Class<?>... checkFor) {
         while (!isType(checkFor, e)) {
             Throwable cause = e.getCause();
-            if (cause instanceof Exception e1) {
-                e = e1;
+            if (cause instanceof Exception) {
+                e = (Exception) cause;
             } else {
                 return false;
             }

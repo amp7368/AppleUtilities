@@ -51,7 +51,7 @@ public class AppleEventListenerMap {
         public boolean equals(Object obj) {
             if (obj == this) return true;
             if (obj == null || obj.getClass() != this.getClass()) return false;
-            var that = (AppleListenerWrapper) obj;
+            AppleListenerWrapper that = (AppleListenerWrapper) obj;
             return Objects.equals(this.listener, that.listener) &&
                     Objects.equals(this.priority, that.priority);
         }

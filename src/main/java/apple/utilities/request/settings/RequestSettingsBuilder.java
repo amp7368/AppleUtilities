@@ -5,6 +5,7 @@ import apple.utilities.request.RequestLogger;
 import apple.utilities.structures.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class RequestSettingsBuilder<T> {
     }
 
     public RequestSettingsBuilder<T> withExceptionHandler(ExceptionHandler exceptionHandler) {
-        this.exceptionHandler = new ArrayList<>(List.of(new Pair<>(exceptionHandler, 0)));
+        this.exceptionHandler = new ArrayList<>(Collections.singletonList(new Pair<>(exceptionHandler, 0)));
         return this;
     }
 

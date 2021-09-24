@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public interface RequestLogger<T> {
     @Contract(value = " -> new", pure = true)
     static <T> @NotNull RequestLogger<T> empty() {
-        return new RequestLogger<>() {
+        return new RequestLogger<T>() {
         };
     }
 

@@ -12,8 +12,8 @@ public class SystemUsage {
 
     static {
         java.lang.management.OperatingSystemMXBean s = ManagementFactory.getOperatingSystemMXBean();
-        if (s instanceof com.sun.management.OperatingSystemMXBean os) {
-            OS = os;
+        if (s instanceof com.sun.management.OperatingSystemMXBean) {
+            OS = (com.sun.management.OperatingSystemMXBean) s;
         } else {
             OS = null;
         }
@@ -23,7 +23,7 @@ public class SystemUsage {
      * @return a value between 0 and 1 depending on cpu usage
      */
     public static double getProcessCpuLoad() {
-        return OS.getCpuLoad();
+        return OS.getProcessCpuLoad();
     }
 
     /**
