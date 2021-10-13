@@ -30,7 +30,7 @@ public class AppleJsonFromURL<Out> implements AppleRequest<Out> {
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
             return gson.fromJson(input, outputType);
         } catch (MalformedURLException e) {
-            throw new AppleRequestException("url is not valid");
+            throw new AppleRequestException("url is not valid", e);
         } catch (IOException | JsonIOException | JsonSyntaxException e) {
             throw new AppleRequestException(url + " had an IOException", e);
         }

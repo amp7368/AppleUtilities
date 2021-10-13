@@ -5,6 +5,7 @@ import apple.utilities.request.AppleRequestQueue;
 import apple.utilities.request.AppleRequestService;
 import apple.utilities.request.ExceptionHandler;
 import apple.utilities.request.settings.RequestSettingsBuilder;
+import apple.utilities.util.ExceptionUnpackaging;
 import apple.utilities.util.FileFormatting;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public interface AppleJsonDatabaseLoader<DBType> {
     default AppleRequestService.RequestHandler<DBType> load(Class<DBType> dbType, File file, Consumer<DBType> runAfter) {
         RequestSettingsBuilder<DBType> settings = getLoadingSettings();
         settings.addExceptionHandler((e) -> {
-            if (!(e instanceof FileNotFoundException || e.getCause() instanceof FileNotFoundException)) {
+            if (!ExceptionUnpackaging.exists(e, FileNotFoundException.class)) {
                 ExceptionHandler.throwE(e);
             }
         }, Integer.MAX_VALUE);
@@ -63,7 +64,7 @@ public interface AppleJsonDatabaseLoader<DBType> {
     default DBType loadNow(Class<DBType> dbType, File file) {
         RequestSettingsBuilder<DBType> settings = getLoadingSettings();
         settings.addExceptionHandler((e) -> {
-            if (!(e instanceof FileNotFoundException || e.getCause() instanceof FileNotFoundException)) {
+            if (!ExceptionUnpackaging.exists(e, FileNotFoundException.class)) {
                 ExceptionHandler.throwE(e);
             }
         }, Integer.MAX_VALUE);

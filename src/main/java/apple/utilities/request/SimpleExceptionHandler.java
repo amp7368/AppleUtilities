@@ -1,5 +1,7 @@
 package apple.utilities.request;
 
+import apple.utilities.util.ExceptionUnpackaging;
+
 public class SimpleExceptionHandler implements ExceptionHandler {
     private static final SimpleExceptionHandler instance = new SimpleExceptionHandler();
     private final Class<?>[] ignored;
@@ -25,11 +27,9 @@ public class SimpleExceptionHandler implements ExceptionHandler {
 
     @Override
     public void accept(Exception e) throws AppleRequest.AppleRuntimeRequestException {
-        for (Class<?> ignore : ignored) {
-            if (ignore.isInstance(e) || ignore.isInstance(e.getCause())) {
-                if (runAfter != null) runAfter.run();
-                return;
-            }
+        if (ExceptionUnpackaging.exists(e, ignored)) {
+            if (runAfter != null) runAfter.run();
+            return;
         }
         if (runAfter != null) runAfter.run();
         throw new AppleRequest.AppleRuntimeRequestException(e.getMessage(), e);

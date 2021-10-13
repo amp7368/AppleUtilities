@@ -5,4 +5,8 @@ public class RequestSettingsBuilderVoid extends RequestSettingsBuilder<Boolean> 
 
     public RequestSettingsBuilderVoid() {
     }
+
+    public static RequestSettingsBuilderVoid empty() {
+        return new RequestSettingsBuilderVoid();
+    }
 }
