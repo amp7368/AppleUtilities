@@ -65,6 +65,7 @@ task jarAndCopyFiles {
          'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaGameMechanics\\lib\\',
          'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaAppleMisc\\lib\\',
          'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaUtilities\\lib\\',
+         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaDungeons\\lib\\',
          'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\SpotifyAnalysis\\lib\\'
         ].each { dest ->
             {

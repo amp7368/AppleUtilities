@@ -85,7 +85,7 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
             AppleRequestService.RequestCalled called = new AppleRequestService.RequestCalled(requestToRun, System.currentTimeMillis());
             synchronized (this) {
                 this.pastRequests.add(called);
-                timeToNextRequest = failed ? Math.max(getFailSafeGuardBuffer(), checkTimeToNextRequestLazy()) : checkTimeFromPastRequests();
+                timeToNextRequest = failed ? Math.max(getFailSafeGuardBuffer(), checkTimeFromPastRequests()) : checkTimeFromPastRequests();
             }
             if (timeToNextRequest > 0) {
                 try {
@@ -106,6 +106,7 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
         }
     }
 
+    // todo make this actually lazy
     private long checkTimeToNextRequestLazy() {
         synchronized (this) {
             long timeFromPast = checkTimeFromPastRequests();

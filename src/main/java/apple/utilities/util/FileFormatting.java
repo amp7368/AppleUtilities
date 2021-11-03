@@ -16,4 +16,20 @@ public class FileFormatting {
         }
         return file;
     }
+
+    public static String extension(String file, String fileExtension) {
+        return file + "." + fileExtension;
+    }
+
+    public static String extensionJson(String file) {
+        return extension(file, "json");
+    }
+
+    public static String extensionYml(String file) {
+        return extension(file, "yml");
+    }
+
+    public static String extensionDb(String file) {
+        return extension(file, "db");
+    }
 }

@@ -83,7 +83,7 @@ public class NumberUtils {
                 originalScore = value;
             }
         }
-        return new Scored(originalScore, original);
+        return new Scored<>(originalScore, original);
 
     }
 
