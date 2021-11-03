@@ -35,26 +35,26 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
                                                        @Nullable Consumer<T> runAfter,
                                                        @Nullable RequestSettingsBuilder<T> builder,
                                                        AppleRequestOnConflict<T> requestConflict) {
-        synchronized (this) {
-            RequestHandlerTimed<T> oldRequest = idToRequests.get(id);
-            if (oldRequest == null) {
+        synchronized (requests) {
+            RequestHandlerTimed<T> oldRequestHandler = idToRequests.get(id);
+            if (oldRequestHandler == null) {
                 if (runAfter == null) runAfter = (t) -> {
                 };
                 if (builder == null) builder = getDefaultSettings();
-                oldRequest = new RequestHandlerTimed<>(id, newRequest, runAfter, builder);
-                requests.add(oldRequest);
-                this.idToRequests.put(id, oldRequest);
+                oldRequestHandler = new RequestHandlerTimed<>(id, newRequest, runAfter, builder);
+                requests.add(oldRequestHandler);
+                this.idToRequests.put(id, oldRequestHandler);
             } else {
-                AppleRequest<T> oldRequestGetter = oldRequest.getRequest();
-                oldRequest.setRequest(requestConflict.onConflict(oldRequestGetter, newRequest));
-                if (runAfter != null) oldRequest.setRunAfter(runAfter);
-                if (builder != null) oldRequest.setBuilder(builder);
+                AppleRequest<T> oldRequestGetter = oldRequestHandler.getRequest();
+                oldRequestHandler.setRequest(requestConflict.onConflict(oldRequestGetter, newRequest));
+                if (runAfter != null) oldRequestHandler.setRunAfter(runAfter);
+                if (builder != null) oldRequestHandler.setBuilder(builder);
             }
             if (!isRunningRequests) {
                 isRunningRequests = true;
                 new Thread(this::eatRequests).start();
             }
-            return oldRequest;
+            return oldRequestHandler;
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
 
     private void eatRequests() {
         RequestHandlerTimed<?> requestToRun;
-        synchronized (this) {
+        synchronized (requests) {
             if (requests.isEmpty()) {
                 requestToRun = null;
                 this.isRunningRequests = false;
@@ -83,18 +83,19 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
             }
             long timeToNextRequest;
             AppleRequestService.RequestCalled called = new AppleRequestService.RequestCalled(requestToRun, System.currentTimeMillis());
-            synchronized (this) {
+            synchronized (requests) {
                 this.pastRequests.add(called);
-                timeToNextRequest = failed ? Math.max(getFailSafeGuardBuffer(), checkTimeFromPastRequests()) : checkTimeFromPastRequests();
+                timeToNextRequest = failed ? Math.max(getFailSafeGuardBuffer(), checkTimeToNextRequestLazy()) : checkTimeToNextRequestLazy();
             }
             if (timeToNextRequest > 0) {
                 try {
+                    System.out.println(timeToNextRequest);
                     Thread.sleep(timeToNextRequest);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            synchronized (this) {
+            synchronized (requests) {
                 if (requests.isEmpty()) {
                     requestToRun = null;
                     this.isRunningRequests = false;
@@ -106,9 +107,8 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
         }
     }
 
-    // todo make this actually lazy
     private long checkTimeToNextRequestLazy() {
-        synchronized (this) {
+        synchronized (requests) {
             long timeFromPast = checkTimeFromPastRequests();
             if (requests.isEmpty()) return timeFromPast;
             long timeToNextRequest = getLazinessMillis() - System.currentTimeMillis() - requests.get(0).getCalledTime();
@@ -117,7 +117,7 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
     }
 
     private long checkTimeFromPastRequests() {
-        synchronized (this) {
+        synchronized (requests) {
             long now = System.currentTimeMillis();
             Iterator<AppleRequestService.RequestCalled> iterator = pastRequests.iterator();
             while (iterator.hasNext()) {
