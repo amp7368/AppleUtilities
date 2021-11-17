@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 @FunctionalInterface
-public interface AppleRequestOnConflict<T> {
+public interface AppleRequestOnConflict<R> {
     @Contract(pure = true)
     static <T> @NotNull AppleRequestOnConflict<T> ADD() {
         return AppleRequest::andThen;
@@ -17,5 +17,5 @@ public interface AppleRequestOnConflict<T> {
         return (o, n) -> n;
     }
 
-    AppleRequest<T> onConflict(AppleRequest<T> oldRequest, AppleRequest<T> newRequest);
+    AppleRequest<R> onConflict(AppleRequest<R> oldRequest, AppleRequest<R> newRequest);
 }

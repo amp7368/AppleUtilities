@@ -20,7 +20,12 @@ public interface AppleJsonDatabaseSaver<DBType extends SaveFileable> {
     default AppleRequestService.RequestHandler<?> save(DBType saving) {
         File dbFile = new File(getDBFolder(), saving.getSaveFile().getPath());
         dbFile.getParentFile().mkdirs();
-        return getIOService().queueVoid(new AppleJsonToFile(dbFile, saving).withGson(getGson()), getSavingSettings());
+        return getIOService()
+                .queueVoid(
+                        new AppleJsonToFile(dbFile, saving)
+                                .withGson(getGson())
+                        , getSavingSettings()
+                );
     }
 
     default Gson getGson() {

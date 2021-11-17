@@ -4,32 +4,60 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class FileFormatting {
-    public static File getDBFolder(Class<?> mainClass) {
+public interface FileFormatting {
+    String JSON_EXTENSION = "json";
+    String YML_EXTENSION = "yml";
+    String DB_EXTENSION = "db";
+
+    static File getDBFolder(Class<?> mainClass) {
         List<String> list = Arrays.asList(mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().split("/"));
         return new File(String.join("/", list.subList(0, list.size() - 1)));
     }
 
-    public static File fileWithChildren(File file, String... children) {
+    static File fileWithChildren(File file, String... children) {
         for (String child : children) {
             file = new File(file, child);
         }
         return file;
     }
 
-    public static String extension(String file, String fileExtension) {
-        return file + "." + fileExtension;
+    static String extension(String file, String fileExtension) {
+        return file + '.' + fileExtension;
     }
 
-    public static String extensionJson(String file) {
-        return extension(file, "json");
+    static String extensionJson(String file) {
+        return extension(file, JSON_EXTENSION);
     }
 
-    public static String extensionYml(String file) {
-        return extension(file, "yml");
+    static String extensionYml(String file) {
+        return extension(file, YML_EXTENSION);
     }
 
-    public static String extensionDb(String file) {
-        return extension(file, "db");
+    static String extensionDb(String file) {
+        return extension(file, DB_EXTENSION);
+    }
+
+    default File getDBFolderI(Class<?> mainClass) {
+        return getDBFolder(mainClass);
+    }
+
+    default File fileWithChildrenI(File file, String... children) {
+        return fileWithChildren(file, children);
+    }
+
+    default String extensionI(String file, String fileExtension) {
+        return extension(file, fileExtension);
+    }
+
+    default String extensionJsonI(String file) {
+        return extensionJson(file);
+    }
+
+    default String extensionYmlI(String file) {
+        return extensionYml(file);
+    }
+
+    default String extensionDbI(String file) {
+        return extensionDb(file);
     }
 }

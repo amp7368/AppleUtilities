@@ -1,5 +1,7 @@
 package apple.utilities.util;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -40,5 +42,18 @@ public class ObjectUtilsFormatting {
                 return other;
         }
         return defaultValue;
+    }
+
+    @Nullable
+    public static <A, B> B failToNull(@Nullable A supplied, Function<A, B> ifNotNull) {
+        return supplied == null ? null : ifNotNull.apply(supplied);
+    }
+
+    @Nullable
+    public static <A, B, C> C failToNull(@Nullable A supplied, Function<A, B> ifNotNull, Function<B, C> chain2) {
+        if (supplied == null) return null;
+        B chain1 = ifNotNull.apply(supplied);
+        if (chain1 == null) return null;
+        return chain2.apply(chain1);
     }
 }

@@ -151,12 +151,16 @@ public abstract class AppleRequestService implements AppleRequestQueue {
             synchronized (this) {
                 done = true;
                 if (!isWaiting) {
-                    runAfter.accept(gotten);
-                    ranAfter = true;
+                    doRunAfter();
                 }
                 this.notify();
             }
             logger.finishDone(gotten);
+        }
+
+        private void doRunAfter() {
+            if (runAfter != null) runAfter.accept(gotten);
+            ranAfter = true;
         }
 
         public T complete() {
@@ -174,7 +178,7 @@ public abstract class AppleRequestService implements AppleRequestQueue {
 
         public T completeAndRun() {
             gotten = complete();
-            if (!ranAfter) runAfter.accept(gotten);
+            if (!ranAfter) doRunAfter();
             ranAfter = true;
             return gotten;
         }

@@ -7,44 +7,44 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public interface AppleRequestKeyQueue<T> {
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request) {
+public interface AppleRequestKeyQueue<RequestType> {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request) {
         return queue(id, request, (t) -> {
         }, getDefaultSettings());
     }
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request, @Nullable RequestSettingsBuilder<T> builder) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request, @Nullable RequestSettingsBuilder<RequestType> builder) {
         return queue(id, request, (t) -> {
         }, builder);
     }
 
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request, @Nullable Consumer<T> runAfter) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request, @Nullable Consumer<RequestType> runAfter) {
         return queue(id, request, runAfter, getDefaultSettings());
     }
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> newRequest, @Nullable Consumer<T> runAfter, @Nullable RequestSettingsBuilder<T> builder) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> newRequest, @Nullable Consumer<RequestType> runAfter, @Nullable RequestSettingsBuilder<RequestType> builder) {
         return queue(id, newRequest, runAfter, builder, (o, n) -> n);
     }
 
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request, AppleRequestOnConflict<T> onConflict) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request, AppleRequestOnConflict<RequestType> onConflict) {
         return queue(id, request, (t) -> {
         }, getDefaultSettings(), onConflict);
     }
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request, @Nullable RequestSettingsBuilder<T> builder, AppleRequestOnConflict<T> onConflict) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request, @Nullable RequestSettingsBuilder<RequestType> builder, AppleRequestOnConflict<RequestType> onConflict) {
         return queue(id, request, (t) -> {
         }, builder, onConflict);
     }
 
 
-    default AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> request, @Nullable Consumer<T> runAfter, AppleRequestOnConflict<T> onConflict) {
+    default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request, @Nullable Consumer<RequestType> runAfter, AppleRequestOnConflict<RequestType> onConflict) {
         return queue(id, request, runAfter, getDefaultSettings(), onConflict);
     }
 
 
-    AppleRequestService.RequestHandler<T> queue(Object id, AppleRequest<T> newRequest, @Nullable Consumer<T> runAfter, @Nullable RequestSettingsBuilder<T> builder, AppleRequestOnConflict<T> requestConflict);
+    AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> newRequest, @Nullable Consumer<RequestType> runAfter, @Nullable RequestSettingsBuilder<RequestType> builder, AppleRequestOnConflict<RequestType> requestConflict);
 
-    RequestSettingsBuilder<T> getDefaultSettings();
+    RequestSettingsBuilder<RequestType> getDefaultSettings();
 }

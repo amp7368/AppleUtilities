@@ -1,6 +1,7 @@
 package apple.utilities.util;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.function.Function;
 
 public class Pretty {
@@ -16,6 +17,10 @@ public class Pretty {
             split[i] = new String(chars);
         }
         return String.join(" ", split);
+    }
+
+    public static String spaceEnumWords(String s) {
+        return upperCaseFirst(s.replace("_", " ").toLowerCase(Locale.ROOT));
     }
 
     public static String commas(long n) {
