@@ -59,4 +59,12 @@ public class ArrayUtils {
         newList.addAll(Arrays.asList(rest));
         return newList;
     }
+
+    public static <T> T[] subList(T[] array, Function<Integer, T[]> arrayCreator, int beginIndex, int endIndex) {
+        int size = endIndex - beginIndex;
+        if (size <= 0) size = array.length + (size % array.length);
+        T[] newArray = arrayCreator.apply(size);
+        System.arraycopy(array, beginIndex, newArray, 0, size);
+        return newArray;
+    }
 }

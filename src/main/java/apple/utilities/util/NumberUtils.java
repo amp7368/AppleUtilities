@@ -17,6 +17,18 @@ public class NumberUtils {
         return lower <= n && n < upper;
     }
 
+    public static boolean betweenExclusiveDouble(double lower, double n, double upper) {
+        return lower < n && n < upper;
+    }
+
+    public static boolean betweenInclusiveDouble(double lower, double n, double upper) {
+        return lower <= n && n <= upper;
+    }
+
+    public static boolean betweenDouble(double lower, double n, double upper) {
+        return lower <= n && n < upper;
+    }
+
     public static boolean[] betweenMultipleExclusive(int lower, int upper, int... ns) {
         boolean[] bs = new boolean[ns.length];
         for (int i = 0; i < ns.length; i++) {
