@@ -1,6 +1,13 @@
 package apple.utilities.util;
 
 public class BooleanUtils {
+    public static boolean and(boolean[] bs) {
+        for (boolean b : bs) {
+            if (!b) return false;
+        }
+        return true;
+    }
+
     public static boolean isAtLeastNTrue(int n, boolean... bs) {
         for (boolean b : bs) {
             if (b && --n == 0) return true;

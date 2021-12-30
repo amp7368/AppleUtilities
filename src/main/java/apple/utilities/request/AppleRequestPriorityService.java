@@ -116,7 +116,7 @@ public abstract class AppleRequestPriorityService<Priority extends AppleRequestP
         return null;
     }
 
-    private long checkTimeToNextRequest(boolean failed) {
+    protected long checkTimeToNextRequest(boolean failed) {
         synchronized (this) {
             long now = System.currentTimeMillis();
             Iterator<AppleRequestService.RequestCalled> iterator = pastRequests.iterator();

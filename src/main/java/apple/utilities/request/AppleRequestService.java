@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 public abstract class AppleRequestService implements AppleRequestQueue {
     private final List<RequestHandler<?>> requests = new ArrayList<>();
     private final List<RequestCalled> pastRequests = new ArrayList<>();
+
     private boolean isRunningRequests = false;
 
     public abstract int getRequestsPerTimeUnit();

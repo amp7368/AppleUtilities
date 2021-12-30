@@ -3,19 +3,26 @@ package apple.utilities.request;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class AppleJsonFromURL<Out> implements AppleRequest<Out> {
     private final String url;
-    private final Class<Out> outputType;
+    private final Type outputType;
     private Gson gson = new Gson();
 
     public AppleJsonFromURL(String url, Class<Out> outputType) {
+        this.url = url.replace(" ", "%20");
+        this.outputType = TypeToken.get(outputType).getType();
+    }
+
+    public AppleJsonFromURL(String url, Type outputType) {
         this.url = url.replace(" ", "%20");
         this.outputType = outputType;
     }

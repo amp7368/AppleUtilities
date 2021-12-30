@@ -1,8 +1,7 @@
 package apple.utilities.util;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Paths;
 
 public interface FileFormatting {
     String JSON_EXTENSION = "json";
@@ -10,8 +9,9 @@ public interface FileFormatting {
     String DB_EXTENSION = "db";
 
     static File getDBFolder(Class<?> mainClass) {
-        List<String> list = Arrays.asList(mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().split("/"));
-        return new File(String.join("/", list.subList(0, list.size() - 1)));
+        return Paths.get("").toAbsolutePath().toFile();
+//        List<String> list = Arrays.asList(mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().split("/"));
+//        return new File(String.join("/", list.subList(0, list.size() - 1)));
     }
 
     static File fileWithChildren(File file, String... children) {

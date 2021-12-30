@@ -3,7 +3,6 @@ package apple.utilities.request;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,9 +21,9 @@ public class AppleJsonFromFile<Out> implements AppleRequest<Out> {
         this.getThisType = null;
     }
 
-    public AppleJsonFromFile(File fileToSaveTo, TypeToken<Out> getThis) {
+    public AppleJsonFromFile(File fileToSaveTo, Type getThis) {
         this.fileToSaveTo = fileToSaveTo;
-        this.getThisType = getThis.getType();
+        this.getThisType = getThis;
         this.getThis = null;
     }
 

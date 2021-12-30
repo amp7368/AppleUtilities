@@ -89,7 +89,6 @@ public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue
             }
             if (timeToNextRequest > 0) {
                 try {
-                    System.out.println(timeToNextRequest);
                     Thread.sleep(timeToNextRequest);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
