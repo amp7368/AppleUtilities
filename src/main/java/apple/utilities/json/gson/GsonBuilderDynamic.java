@@ -15,6 +15,7 @@ public class GsonBuilderDynamic implements Supplier<Gson> {
     private final List<Pair<Type, Object>> typeAdapters = new ArrayList<>();
     private final List<TypeAdapterFactory> typeAdapterFactories = new ArrayList<>();
     private Gson gsonFinal = null;
+    private Supplier<GsonBuilder> builderBase = GsonBuilder::new;
 
     public GsonBuilderDynamic() {
     }
@@ -24,6 +25,7 @@ public class GsonBuilderDynamic implements Supplier<Gson> {
         this.typeHierarchyAdapters.addAll(other.typeHierarchyAdapters);
         this.typeAdapters.addAll(other.typeAdapters);
         this.typeAdapterFactories.addAll(other.typeAdapterFactories);
+        this.builderBase = other.builderBase;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class GsonBuilderDynamic implements Supplier<Gson> {
 
     public Gson create() {
         if (gsonFinal == null) {
-            GsonBuilder builder = new GsonBuilder();
+            GsonBuilder builder = builderBase.get();
             for (Pair<Class<?>, Object> typeAdapter : typeHierarchyAdapters) {
                 builder.registerTypeHierarchyAdapter(typeAdapter.getKey(), typeAdapter.getValue());
             }
@@ -46,6 +48,11 @@ public class GsonBuilderDynamic implements Supplier<Gson> {
             this.gsonFinal = builder.create();
         }
         return gsonFinal;
+    }
+
+    public GsonBuilderDynamic withBaseBuilder(Supplier<GsonBuilder> builder) {
+        this.builderBase = builder;
+        return this;
     }
 
     public GsonBuilderDynamic copy() {

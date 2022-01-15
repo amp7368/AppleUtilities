@@ -64,6 +64,7 @@ task jarAndCopyFiles {
     doLast {
         ['C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\SpotifyAnalysis\\lib',
          'C:\\Users\\Aaron\\Desktop\\Idea\\Libraries\\SpotifySPL\\lib',
+         'C:\\Users\\Aaron\\Desktop\\builds\\Idea\\Lib',
          'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\CloverBot\\lib\\',
          'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\BuildBot\\lib\\',
          'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\Excursion\\lib\\',

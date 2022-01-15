@@ -1,7 +1,6 @@
 package apple.utilities.util;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 public interface FileFormatting {
     String JSON_EXTENSION = "json";
@@ -9,9 +8,8 @@ public interface FileFormatting {
     String DB_EXTENSION = "db";
 
     static File getDBFolder(Class<?> mainClass) {
-        return Paths.get("").toAbsolutePath().toFile();
-//        List<String> list = Arrays.asList(mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().split("/"));
-//        return new File(String.join("/", list.subList(0, list.size() - 1)));
+        File list = new File(mainClass.getProtectionDomain().getCodeSource().getLocation().getFile());
+        return list.getParentFile();
     }
 
     static File fileWithChildren(File file, String... children) {
@@ -37,6 +35,12 @@ public interface FileFormatting {
         return extension(file, DB_EXTENSION);
     }
 
+    static File folderWithChildren(File file, String... children) {
+        file = fileWithChildren(file, children);
+        file.mkdirs();
+        return file;
+    }
+
     default File getDBFolderI(Class<?> mainClass) {
         return getDBFolder(mainClass);
     }
@@ -59,5 +63,9 @@ public interface FileFormatting {
 
     default String extensionDbI(String file) {
         return extensionDb(file);
+    }
+
+    default File folderWithChildrenI(File file, String... children) {
+        return folderWithChildren(file, children);
     }
 }
