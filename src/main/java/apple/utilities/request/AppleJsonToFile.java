@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Deprecated
 public class AppleJsonToFile implements AppleRequestVoid {
     private final File fileToSaveTo;
     private final Object saveThis;

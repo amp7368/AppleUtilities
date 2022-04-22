@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Deprecated
 public class RequestSettingsBuilder<T> {
     private List<Pair<ExceptionHandler, Integer>> exceptionHandler = new ArrayList<>();
     private RequestLogger<T> requestLogger = RequestLogger.empty();

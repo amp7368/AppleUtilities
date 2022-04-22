@@ -3,6 +3,7 @@ package apple.utilities.request;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 @FunctionalInterface
 public interface AppleRequest<T> {
     T get() throws AppleRequestException;

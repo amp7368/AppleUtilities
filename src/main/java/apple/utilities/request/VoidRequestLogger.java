@@ -1,5 +1,6 @@
 package apple.utilities.request;
 
+@Deprecated
 public interface VoidRequestLogger extends RequestLogger<Boolean> {
     VoidRequestLogger EMPTY = new VoidRequestLogger() {
     };

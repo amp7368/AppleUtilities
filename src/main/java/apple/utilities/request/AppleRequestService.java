@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Deprecated
 public abstract class AppleRequestService implements AppleRequestQueue {
     private final List<RequestHandler<?>> requests = new ArrayList<>();
     private final List<RequestCalled> pastRequests = new ArrayList<>();

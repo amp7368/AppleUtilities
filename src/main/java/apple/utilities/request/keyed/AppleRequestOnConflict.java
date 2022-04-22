@@ -4,7 +4,7 @@ import apple.utilities.request.AppleRequest;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-
+@Deprecated
 @FunctionalInterface
 public interface AppleRequestOnConflict<R> {
     @Contract(pure = true)

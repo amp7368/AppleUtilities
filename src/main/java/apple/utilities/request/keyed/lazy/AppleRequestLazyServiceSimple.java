@@ -2,6 +2,7 @@ package apple.utilities.request.keyed.lazy;
 
 import apple.utilities.request.settings.RequestSettingsBuilder;
 
+@Deprecated
 public class AppleRequestLazyServiceSimple<T> extends AppleRequestLazyService<T> {
     private final int requestsPerTimeUnit;
     private final int timeUnitMillis;

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
+@Deprecated
 public interface AppleJsonDatabaseManager<DBType extends SaveFileable> extends AppleJsonDatabaseSaver<DBType>, AppleJsonDatabaseLoader<DBType> {
     @NotNull
     static File getDBFolder(Class<?> mainClass) {

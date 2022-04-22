@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+@Deprecated
 public interface AppleJsonDatabaseLoaderKeyed<DBType> {
     Gson DEFAULT_GSON = new Gson();
 

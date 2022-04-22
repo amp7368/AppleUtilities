@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+@Deprecated
 public class AppleJsonFromFile<Out> implements AppleRequest<Out> {
     private final File fileToSaveTo;
     private final Class<Out> getThis;

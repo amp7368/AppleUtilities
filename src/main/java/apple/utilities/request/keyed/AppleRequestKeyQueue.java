@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+@Deprecated
 public interface AppleRequestKeyQueue<RequestType> {
     default AppleRequestService.RequestHandler<RequestType> queue(Object id, AppleRequest<RequestType> request) {
         return queue(id, request, (t) -> {

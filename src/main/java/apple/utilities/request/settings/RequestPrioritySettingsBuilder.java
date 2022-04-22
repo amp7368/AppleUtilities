@@ -5,6 +5,7 @@ import apple.utilities.request.ExceptionHandler;
 import apple.utilities.request.RequestLogger;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class RequestPrioritySettingsBuilder<T, Priority extends AppleRequestPriorityService.AppleRequestPriority> extends RequestSettingsBuilder<T> {
     private Priority priority = null;
 

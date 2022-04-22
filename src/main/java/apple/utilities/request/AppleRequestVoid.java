@@ -1,5 +1,5 @@
 package apple.utilities.request;
-
+@Deprecated
 public interface AppleRequestVoid extends AppleRequest<Boolean> {
     AppleRequestVoid EMPTY = () -> {
     };

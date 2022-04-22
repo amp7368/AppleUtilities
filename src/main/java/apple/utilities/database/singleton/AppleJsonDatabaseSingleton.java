@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 
+@Deprecated
 public class AppleJsonDatabaseSingleton<DBType extends SaveFileable> implements AppleJsonDatabaseManager<DBType> {
     private final RequestSettingsBuilder<DBType> loadingSettings;
     private final File dbFolder;

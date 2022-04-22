@@ -9,7 +9,7 @@ import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import com.google.gson.Gson;
 
 import java.io.File;
-
+@Deprecated
 public class AppleJsonDatabaseKeyedBuilder<DBType extends SaveFileableKeyed> {
     private Class<DBType> dbClass;
     private File dbFolder;

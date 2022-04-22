@@ -1,83 +1,63 @@
 package apple.utilities.database.ajd;
 
-import apple.utilities.request.*;
-import apple.utilities.request.settings.RequestSettingsBuilder;
-import apple.utilities.util.ExceptionUnpackaging;
-import apple.utilities.util.FileFormatting;
-import com.google.gson.Gson;
-import org.jetbrains.annotations.Nullable;
+import apple.utilities.structures.empty.Placeholder;
+import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
+import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 
-public class AppleAJDInstImpl<DBType> implements FileFormatting {
-    private static final Gson DEFAULT_GSON = new Gson();
+public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD {
     protected final Class<DBType> dbType;
-    private final AppleRequestQueue ioService;
-    private final File file;
-    private Gson gson = null;
-    private DBType thing;
+    protected final File file;
+    protected final AsyncTaskQueueStart<TaskExtra> queue;
+    protected DBType thing = null;
 
-    public AppleAJDInstImpl(File file, Class<DBType> dbType, AppleRequestQueue ioService) {
-        this.file = file;
+    public AppleAJDInstImpl(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
         this.dbType = dbType;
-        this.ioService = ioService;
-    }
-
-    public AppleAJDInstImpl(File file, Class<DBType> dbType, AppleRequestQueue ioService, Gson gson) {
         this.file = file;
-        this.dbType = dbType;
-        this.ioService = ioService;
-        this.gson = gson;
+        this.queue = queue;
     }
 
-    public AppleRequestService.RequestHandler<?> save() {
-        file.getParentFile().mkdirs();
-        return getIOService()
-                .queueVoid(
-                        new AppleJsonToFile(file, thing)
-                                .withGson(getGson())
-                );
+    public void set(DBType newThing) {
+        this.thing = newThing;
     }
 
-    private Gson getGson() {
-        return gson == null ? DEFAULT_GSON : gson;
+    public void saveNow() {
+        this.save().complete();
     }
 
-    private AppleRequestQueue getIOService() {
-        return ioService;
+    public AsyncTaskAttempt<Placeholder, TaskExtra> save() {
+        return this.save(this.file, this.thing, this.queue);
     }
 
-    public AppleRequestService.RequestHandler<DBType> load(Consumer<DBType> parentRunAfter) {
-        Consumer<DBType> runAfter = (thing) -> {
-            this.thing = thing;
-            parentRunAfter.accept(thing);
-        };
-        RequestSettingsBuilder<DBType> settings = RequestSettingsBuilder.empty();
-        settings.addExceptionHandler((e) -> {
-            if (!ExceptionUnpackaging.exists(e, FileNotFoundException.class)) {
-                ExceptionHandler.throwE(e);
-            }
-        }, Integer.MAX_VALUE);
-        return getIOService().queue(new AppleJsonFromFile<>(file, dbType).withGson(getGson()), runAfter, settings);
+    public AsyncTaskAttempt<DBType, TaskExtra> load() {
+        AsyncTaskAttempt<DBType, TaskExtra> load = this.load(this.file, this.dbType, this.queue);
+        load.onSuccess((newThing) -> this.thing = newThing);
+        return load;
     }
 
-    public @Nullable DBType loadNow() {
-        return load((c) -> {
-        }).complete();
+    public DBType loadNow() {
+        return this.load().complete();
     }
 
-    public DBType loadNowOrMake() {
-        thing = loadNow();
-        if (thing != null) return thing;
+    public DBType loadOrMake() {
+        this.thing = this.loadNow();
+        if (this.thing == null) makeNew();
+        return this.thing;
+    }
+
+    private void makeNew() {
         try {
-            thing = dbType.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            this.thing = this.dbType.getConstructor().newInstance();
+            this.save();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new IllegalStateException("There is not a no-args constructor in " + this.dbType.getName(), e);
         }
-        save();
-        return thing;
+    }
+
+    public DBType getInstance() {
+        return this.thing;
     }
 }

@@ -1,5 +1,6 @@
 package apple.utilities.request.settings;
 
+@Deprecated
 public class RequestSettingsBuilderVoid extends RequestSettingsBuilder<Boolean> {
     public static final RequestSettingsBuilderVoid VOID = new RequestSettingsBuilderVoid();
 

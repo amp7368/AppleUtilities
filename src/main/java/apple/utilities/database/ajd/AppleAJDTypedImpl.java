@@ -1,67 +1,37 @@
 package apple.utilities.database.ajd;
 
 import apple.utilities.database.SaveFileable;
-import apple.utilities.request.AppleRequestQueue;
-import apple.utilities.request.AppleRequestService;
-import com.google.gson.Gson;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import apple.utilities.structures.empty.Placeholder;
+import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
+import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.function.Consumer;
 
-public class AppleAJDTypedImpl<DBType extends SaveFileable> implements AppleAJD {
+public class AppleAJDTypedImpl<DBType extends SaveFileable, TaskExtra> extends AppleAJD {
     protected final Class<DBType> dbType;
-    private final File dbFolder;
-    private final AppleRequestQueue ioService;
-    private Gson gson = null;
+    protected final File folder;
+    protected final AsyncTaskQueueStart<TaskExtra> queue;
 
-    public AppleAJDTypedImpl(File dbFolder, Class<DBType> dbType, AppleRequestQueue ioService) {
-        this.dbFolder = dbFolder;
+    public AppleAJDTypedImpl(Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue) {
         this.dbType = dbType;
-        this.ioService = ioService;
+        this.folder = folder;
+        this.queue = queue;
     }
 
-    public AppleAJDTypedImpl(File dbFolder, Class<DBType> dbType, AppleRequestQueue ioService, Gson gson) {
-        this.dbFolder = dbFolder;
-        this.dbType = dbType;
-        this.ioService = ioService;
-        this.gson = gson;
+    public void saveInFolderNow(DBType saveThis) {
+        this.saveInFolder(saveThis).complete();
     }
 
-    public @NotNull Collection<DBType> loadAllNow() {
-        return AppleAJD.super.loadAllNow(dbType);
+    public AsyncTaskAttempt<Placeholder, TaskExtra> saveInFolder(DBType saveThis) {
+        return this.saveInFolder(this.folder, saveThis, this.queue);
     }
 
-    public AppleRequestService.RequestHandler<DBType> load(String fileName, Consumer<DBType> runAfter) {
-        return AppleAJD.super.load(dbType, fileName, runAfter);
+    public Collection<AsyncTaskAttempt<DBType, TaskExtra>> loadFolder() {
+        return this.loadFolder(this.folder, this.dbType, this.queue);
     }
 
-    public AppleRequestService.RequestHandler<DBType> load(File file, Consumer<DBType> runAfter) {
-        return AppleAJD.super.load(dbType, file, runAfter);
-    }
-
-    public @Nullable DBType loadNow(String fileName) {
-        return AppleAJD.super.loadNow(dbType, fileName);
-    }
-
-    public @Nullable DBType loadNow(File file) {
-        return AppleAJD.super.loadNow(dbType, file);
-    }
-
-    @Override
-    public File getDBFolder() {
-        return dbFolder;
-    }
-
-    @Override
-    public AppleRequestQueue getIOService() {
-        return ioService;
-    }
-
-    @Override
-    public Gson getGson() {
-        return gson == null ? AppleAJD.super.getGson() : gson;
+    public Collection<DBType> loadFolderNow() {
+        return this.loadFolderNow(this.folder, this.dbType, this.queue);
     }
 }

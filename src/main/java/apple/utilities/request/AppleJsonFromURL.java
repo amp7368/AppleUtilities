@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@Deprecated
 public class AppleJsonFromURL<Out> implements AppleRequest<Out> {
     private final String url;
     private final Type outputType;

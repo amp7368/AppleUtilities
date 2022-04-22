@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 
+@Deprecated
 public interface AppleJsonDatabaseManagerKeyed<DBType extends SaveFileableKeyed> extends AppleJsonDatabaseSaverKeyed<DBType>, AppleJsonDatabaseLoaderKeyed<DBType> {
     @Override
     Class<DBType> getDbClass();

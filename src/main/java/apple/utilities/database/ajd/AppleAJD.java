@@ -1,88 +1,51 @@
 package apple.utilities.database.ajd;
 
-import apple.utilities.database.SaveFileable;
-import apple.utilities.request.*;
-import apple.utilities.request.settings.RequestSettingsBuilder;
-import apple.utilities.util.ExceptionUnpackaging;
-import apple.utilities.util.FileFormatting;
-import com.google.gson.Gson;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import apple.utilities.structures.empty.Placeholder;
+import apple.utilities.threading.util.supplier.SupplierUncaught;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Consumer;
 
-public interface AppleAJD extends FileFormatting {
-    Gson DEFAULT_GSON = new Gson();
+public class AppleAJD implements AppleAJDUtil {
+    private AppleAJDSerializing serializing;
 
-    default <DBType extends SaveFileable> AppleRequestService.RequestHandler<?> save(DBType saving) {
-        File dbFile = new File(getDBFolder(), saving.getSaveFile().getPath());
-        dbFile.getParentFile().mkdirs();
-        return getIOService()
-                .queueVoid(
-                        new AppleJsonToFile(dbFile, saving)
-                                .withGson(getGson())
-                );
+    {
+        setSerializingJson();
     }
 
-    @NotNull
-    default <DBType> Collection<DBType> loadAllNow(Class<DBType> dbType) {
-        File folder = getDBFolder();
-        File[] files;
-        if (folder.isDirectory())
-            files = folder.listFiles();
-        else
-            files = new File[0];
-        Collection<DBType> dbs = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                dbs.add(loadNow(dbType, file));
-            }
-        }
-        return dbs;
+    public void setSerializing(AppleAJDSerializer serializer, AppleAJDDeserializer deserializer) {
+        this.serializing = new AppleAJDSerializing(serializer, deserializer);
     }
 
-    File getDBFolder();
-
-    default <DBType> AppleRequestService.RequestHandler<DBType> load(Class<DBType> dbType, String fileName, Consumer<DBType> runAfter) {
-        return load(dbType, new File(getDBFolder(), fileName), runAfter);
+    public void setSerializingJson() {
+        this.setSerializing(this::jsonSerializer, this::jsonDeserializer);
     }
 
-    default <DBType> AppleRequestService.RequestHandler<DBType> load(Class<DBType> dbType, File file, Consumer<DBType> runAfter) {
-        RequestSettingsBuilder<DBType> settings = RequestSettingsBuilder.empty();
-        settings.addExceptionHandler((e) -> {
-            if (!ExceptionUnpackaging.exists(e, FileNotFoundException.class)) {
-                ExceptionHandler.throwE(e);
-            }
-        }, Integer.MAX_VALUE);
-        return getIOService().queue(new AppleJsonFromFile<>(file, dbType).withGson(getGson()), runAfter, settings);
+    public void setSerializingYaml() {
+        this.setSerializing(this::yamlSerializer, this::yamlDeserializer);
     }
 
-    @Nullable
-    default <DBType> DBType loadNow(Class<DBType> dbType, String fileName) {
-        return loadNow(dbType, new File(getDBFolder(), fileName));
+    @Override
+    public <DBType> SupplierUncaught<Placeholder> serializer(File file, DBType saveThis) {
+        return this.serializing.serializer().accept(file, saveThis);
     }
 
-    @Nullable
-    default <DBType> DBType loadNow(Class<DBType> dbType, File file) {
-        RequestSettingsBuilder<DBType> settings = RequestSettingsBuilder.empty();
-        settings.addExceptionHandler((e) -> {
-            if (!ExceptionUnpackaging.exists(e, FileNotFoundException.class)) {
-                ExceptionHandler.throwE(e);
-            }
-        }, Integer.MAX_VALUE);
-
-        return getIOService().queue(new AppleJsonFromFile<>(file, dbType).withGson(getGson()), (f) -> {
-        }, settings).complete();
+    @Override
+    public <DBType> SupplierUncaught<DBType> deserializer(File file, Class<DBType> dbType) {
+        return this.serializing.deserializer().accept(file, dbType);
     }
 
-    default Gson getGson() {
-        return DEFAULT_GSON;
+    @FunctionalInterface
+    public interface AppleAJDSerializer {
+        <DBType> SupplierUncaught<Placeholder> accept(File file, DBType saveThis);
     }
 
-    AppleRequestQueue getIOService();
+    @FunctionalInterface
+    public interface AppleAJDDeserializer {
+        <DBType> SupplierUncaught<DBType> accept(File file, Class<DBType> saveThis);
+    }
+
+    public record AppleAJDSerializing(AppleAJDSerializer serializer, AppleAJDDeserializer deserializer) {
+    }
+
 
 }

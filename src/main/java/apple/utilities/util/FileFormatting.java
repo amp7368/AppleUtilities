@@ -1,6 +1,6 @@
 package apple.utilities.util;
 
-import java.io.File;
+import java.io.*;
 
 public interface FileFormatting {
     String JSON_EXTENSION = "json";
@@ -67,5 +67,13 @@ public interface FileFormatting {
 
     default File folderWithChildrenI(File file, String... children) {
         return folderWithChildren(file, children);
+    }
+
+    default BufferedReader bufferedReader(File file) throws FileNotFoundException {
+        return new BufferedReader(new FileReader(file));
+    }
+
+    default BufferedWriter bufferedWriter(File file) throws IOException {
+        return new BufferedWriter(new FileWriter(file));
     }
 }

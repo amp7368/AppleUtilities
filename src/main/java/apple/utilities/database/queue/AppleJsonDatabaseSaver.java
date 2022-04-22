@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 
+@Deprecated
 public interface AppleJsonDatabaseSaver<DBType extends SaveFileable> {
     Gson DEFAULT_GSON = new Gson();
 
@@ -18,7 +19,7 @@ public interface AppleJsonDatabaseSaver<DBType extends SaveFileable> {
     }
 
     default AppleRequestService.RequestHandler<?> save(DBType saving) {
-        File dbFile = new File(getDBFolder(), saving.getSaveFile().getPath());
+        File dbFile = FileFormatting.fileWithChildren(getDBFolder(), saving.getSaveFilePath());
         dbFile.getParentFile().mkdirs();
         return getIOService()
                 .queueVoid(

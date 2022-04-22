@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 
+@Deprecated
 public class AppleJsonDatabaseKeyed<DBType extends SaveFileableKeyed> implements AppleJsonDatabaseManagerKeyed<DBType> {
     private final Class<DBType> dbClass;
     private final File dbFolder;

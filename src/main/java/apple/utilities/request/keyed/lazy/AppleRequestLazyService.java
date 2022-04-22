@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Deprecated
 public abstract class AppleRequestLazyService<T> implements AppleRequestKeyQueue<T> {
     private final List<RequestHandlerTimed<T>> requests = new ArrayList<>();
     private final List<AppleRequestService.RequestCalled> pastRequests = new ArrayList<>();

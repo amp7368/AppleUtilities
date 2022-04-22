@@ -1,8 +1,10 @@
 package apple.utilities.threading;
 
-public interface Daemon {
+import apple.utilities.threading.util.ThreadFactory;
+
+public interface Daemon extends ThreadFactory {
     default void init() {
-        new Thread(this::init1).start();
+        this.startThread(this::init1);
     }
 
     private void init1() {

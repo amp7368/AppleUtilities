@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  main:
+    container_name: ${COMPOSE_NAME}.${MAIN_IMAGE}
+    image: ${COMPOSE_NAME}/${MAIN_IMAGE}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - WORKINGDIR=${WORKINGDIR}
+        - GRADLE_VERSION=${GRADLE_VERSION}
+        - SCRATCH_VERSION=${SCRATCH_VERSION}

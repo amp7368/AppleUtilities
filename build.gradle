@@ -1,91 +1,48 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.2.0"
-    id 'java-library'
     id 'java'
     id 'maven-publish'
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://jitpack.io" }
+    mavenLocal()
 }
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-    archiveClassifier = "sources"
-}
-project.group = groupValue
-project.version = versionValue
 
+project.group groupValue
+project.version versionValue
 publishing {
+    repositories {
+        maven {
+            name 'appleptr16Repo'
+            url 'https://reposilite.appleptr16.com/appleptr16'
+            credentials(PasswordCredentials)
+        }
+    }
     publications {
-        myPublication(MavenPublication) {
+        mavenJava(MavenPublication) {
+            setGroup groupValue
+            setVersion versionValue
             from components.java
-            artifact sourceJar
-            pom {
-                group = groupValue
-                version = versionValue
-                name = project.name
-            }
         }
     }
 }
 
 configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
-}
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+    resolutionStrategy {
+        cacheDynamicVersionsFor 1, 'seconds'
+        cacheChangingModulesFor 1, 'seconds'
+    }
 }
 
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
-    implementation 'org.jetbrains:annotations:22.0.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'org.yaml:snakeyaml:1.29'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.yaml:snakeyaml:1.30'
 }
 
-test {
-    useJUnitPlatform()
-}
-jar {
-}
-def filesToCopy = copySpec {
-    from jar.getArchiveFile()
-}
-
-task jarAndCopyFiles {
-    dependsOn(jar)
-    outputs.upToDateWhen { false }
-    doLast {
-        ['C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\SpotifyAnalysis\\lib',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Libraries\\SpotifySPL\\lib',
-         'C:\\Users\\Aaron\\Desktop\\builds\\Idea\\Lib',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\CloverBot\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\BuildBot\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\Excursion\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\AGX\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\AmbrosiaMarket\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\DiscordBots\\SpotifyAnalysis\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Snowball\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\LoadDependencies\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaGameMechanics\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaAppleMisc\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaUtilities\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\VoltskiyaDungeons\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Volts\\DecodingNms\\lib\\',
-         'C:\\Users\\Aaron\\Desktop\\Idea\\Minecraft\\Libraries\\AppleUtilityLibraries\\lib\\'
-        ].each { dest ->
-            {
-                copy {
-                    with filesToCopy
-                    into dest
-                }
-            }
-        }
-    }
-}

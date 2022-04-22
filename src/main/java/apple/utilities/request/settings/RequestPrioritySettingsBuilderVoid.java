@@ -2,6 +2,7 @@ package apple.utilities.request.settings;
 
 import apple.utilities.request.AppleRequestPriorityService;
 
+@Deprecated
 public class RequestPrioritySettingsBuilderVoid<Priority extends AppleRequestPriorityService.AppleRequestPriority>
         extends RequestPrioritySettingsBuilder<Boolean, Priority> {
     public RequestPrioritySettingsBuilderVoid() {

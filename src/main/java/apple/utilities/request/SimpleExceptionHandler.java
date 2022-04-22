@@ -2,6 +2,7 @@ package apple.utilities.request;
 
 import apple.utilities.util.ExceptionUnpackaging;
 
+@Deprecated
 public class SimpleExceptionHandler implements ExceptionHandler {
     private static final SimpleExceptionHandler instance = new SimpleExceptionHandler();
     private final Class<?>[] ignored;

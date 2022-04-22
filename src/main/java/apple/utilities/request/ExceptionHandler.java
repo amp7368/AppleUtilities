@@ -1,5 +1,6 @@
 package apple.utilities.request;
 
+@Deprecated
 @FunctionalInterface
 public interface ExceptionHandler {
     ExceptionHandler EMPTY = ExceptionHandler::throwE;

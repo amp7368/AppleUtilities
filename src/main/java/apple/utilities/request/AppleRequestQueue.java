@@ -5,6 +5,7 @@ import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 
 import java.util.function.Consumer;
 
+@Deprecated
 public interface AppleRequestQueue {
     default AppleRequestService.RequestHandler<?> queueVoid(AppleRequestVoid request) {
         return queueVoid(request, () -> {

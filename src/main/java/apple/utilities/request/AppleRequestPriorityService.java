@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Deprecated
 public abstract class AppleRequestPriorityService<Priority extends AppleRequestPriorityService.AppleRequestPriority>
         implements AppleRequestQueue {
     private final Map<Priority, List<AppleRequestService.RequestHandler<?>>> requests = new HashMap<>();
