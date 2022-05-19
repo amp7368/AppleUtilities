@@ -7,7 +7,7 @@ import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD {
+public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements AppleAJDInst<DBType, TaskExtra> {
     protected final Class<DBType> dbType;
     protected final File file;
     protected final AsyncTaskQueueStart<TaskExtra> queue;
@@ -19,28 +19,34 @@ public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD {
         this.queue = queue;
     }
 
+    @Override
     public void set(DBType newThing) {
         this.thing = newThing;
     }
 
+    @Override
     public void saveNow() {
         this.save().complete();
     }
 
+    @Override
     public AsyncTaskAttempt<Placeholder, TaskExtra> save() {
         return this.save(this.file, this.thing, this.queue);
     }
 
+    @Override
     public AsyncTaskAttempt<DBType, TaskExtra> load() {
         AsyncTaskAttempt<DBType, TaskExtra> load = this.load(this.file, this.dbType, this.queue);
         load.onSuccess((newThing) -> this.thing = newThing);
         return load;
     }
 
+    @Override
     public DBType loadNow() {
         return this.load().complete();
     }
 
+    @Override
     public DBType loadOrMake() {
         this.thing = this.loadNow();
         if (this.thing == null) makeNew();
@@ -57,6 +63,7 @@ public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD {
         }
     }
 
+    @Override
     public DBType getInstance() {
         return this.thing;
     }

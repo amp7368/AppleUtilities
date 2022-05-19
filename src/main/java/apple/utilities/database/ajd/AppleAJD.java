@@ -1,11 +1,21 @@
 package apple.utilities.database.ajd;
 
+import apple.utilities.database.SaveFileable;
 import apple.utilities.structures.empty.Placeholder;
+import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.util.supplier.SupplierUncaught;
 
 import java.io.File;
 
 public class AppleAJD implements AppleAJDUtil {
+    public static <DBType extends SaveFileable, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
+        return new AppleAJDInstImpl<>(dbType, file, queue);
+    }
+
+    public static <DBType extends SaveFileable, TaskExtra> AppleAJDTyped<DBType, TaskExtra> createTyped(Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue) {
+        return new AppleAJDTypedImpl<>(dbType, folder, queue);
+    }
+
     private AppleAJDSerializing serializing;
 
     {

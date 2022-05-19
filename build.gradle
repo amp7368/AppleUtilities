@@ -4,6 +4,7 @@ plugins {
 }
 
 repositories {
+    maven { url "https://reposilite.appleptr16.com/appleptr16" }
     mavenCentral()
     mavenLocal()
 }
@@ -41,6 +42,7 @@ configurations.all {
 
 dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'apple.file.yml:YmlFileManager:2.0'
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'org.yaml:snakeyaml:1.30'
