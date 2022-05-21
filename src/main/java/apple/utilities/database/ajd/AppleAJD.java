@@ -8,7 +8,7 @@ import apple.utilities.threading.util.supplier.SupplierUncaught;
 import java.io.File;
 
 public class AppleAJD implements AppleAJDUtil {
-    public static <DBType extends SaveFileable, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
+    public static <DBType, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
         return new AppleAJDInstImpl<>(dbType, file, queue);
     }
 
