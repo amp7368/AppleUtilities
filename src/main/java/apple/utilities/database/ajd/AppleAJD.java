@@ -4,6 +4,7 @@ import apple.utilities.database.SaveFileable;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.util.supplier.SupplierUncaught;
+import com.google.gson.Gson;
 
 import java.io.File;
 
@@ -28,6 +29,22 @@ public class AppleAJD implements AppleAJDUtil {
 
     public void setSerializingJson() {
         this.setSerializing(this::jsonSerializer, this::jsonDeserializer);
+    }
+
+    public void setSerializingJson(Gson gson) {
+        AppleAJDSerializer serializer = new AppleAJDSerializer() {
+            @Override
+            public <DBType> SupplierUncaught<Placeholder> accept(File dbFile, DBType saveThis) {
+                return jsonSerializer(dbFile, saveThis, gson);
+            }
+        };
+        AppleAJDDeserializer deserializer = new AppleAJDDeserializer() {
+            @Override
+            public <DBType> SupplierUncaught<DBType> accept(File file, Class<DBType> saveThis) {
+                return jsonDeserializer(file, saveThis, gson);
+            }
+        };
+        this.setSerializing(serializer, deserializer);
     }
 
     public void setSerializingYaml() {

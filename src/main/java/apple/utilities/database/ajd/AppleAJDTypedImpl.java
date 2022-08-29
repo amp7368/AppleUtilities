@@ -21,6 +21,11 @@ public class AppleAJDTypedImpl<DBType extends SaveFileable, TaskExtra> extends A
     }
 
     @Override
+    public boolean delete(DBType deleteThis) {
+        return FileFormatting.fileWithChildren(this.folder, deleteThis.getSaveFilePath()).delete();
+    }
+
+    @Override
     public void saveInFolderNow(DBType saveThis) {
         this.saveInFolder(saveThis).complete();
     }

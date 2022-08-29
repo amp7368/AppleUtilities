@@ -3,7 +3,7 @@ package apple.utilities.database.ajd;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 
-public interface AppleAJDInst<DBType, TaskExtra> {
+public interface AppleAJDInst<DBType, TaskExtra> extends IAppleAJD {
     void set(DBType newThing);
 
     void saveNow();

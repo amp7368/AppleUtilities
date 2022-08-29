@@ -7,7 +7,9 @@ import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import java.io.File;
 import java.util.Collection;
 
-public interface AppleAJDTyped<DBType extends SaveFileable, TaskExtra> {
+public interface AppleAJDTyped<DBType extends SaveFileable, TaskExtra> extends IAppleAJD {
+    boolean delete(DBType deleteThis);
+
     void saveInFolderNow(DBType saveThis);
 
     AsyncTaskAttempt<Placeholder, TaskExtra> saveInFolder(DBType saveThis);

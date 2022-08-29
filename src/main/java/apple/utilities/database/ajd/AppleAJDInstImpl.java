@@ -3,11 +3,12 @@ package apple.utilities.database.ajd;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements AppleAJDInst<DBType, TaskExtra> {
+public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements
+    AppleAJDInst<DBType, TaskExtra> {
+
     protected final Class<DBType> dbType;
     protected final File file;
     protected final AsyncTaskQueueStart<TaskExtra> queue;
@@ -49,7 +50,8 @@ public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements App
     @Override
     public DBType loadOrMake() {
         this.thing = this.loadNow();
-        if (this.thing == null) makeNew();
+        if (this.thing == null)
+            makeNew();
         return this.thing;
     }
 
@@ -59,7 +61,8 @@ public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements App
             this.save();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            throw new IllegalStateException("There is not a no-args constructor in " + this.dbType.getName(), e);
+            throw new IllegalStateException(
+                "There is not a no-args constructor in " + this.dbType.getName(), e);
         }
     }
 

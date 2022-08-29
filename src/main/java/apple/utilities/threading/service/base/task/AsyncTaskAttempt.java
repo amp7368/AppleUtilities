@@ -1,13 +1,13 @@
 package apple.utilities.threading.service.base.task;
 
 import apple.utilities.threading.service.base.failure.TaskFailureProcedure;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import org.jetbrains.annotations.Nullable;
 
 public class AsyncTaskAttempt<T, Extra> {
+
     private final Object runningSync = new Object();
     private final AsyncTaskLife<T, Extra> task;
     private final List<Consumer<T>> onSuccess = new ArrayList<>(1);
@@ -46,10 +46,12 @@ public class AsyncTaskAttempt<T, Extra> {
         if (wasFail) {
             synchronized (onFailure) {
                 onFailure.forEach((c) -> c.accept(this.exception));
+                task.onFailure(this.exception);
             }
         } else {
             synchronized (onSuccess) {
                 onSuccess.forEach((c) -> c.accept(this.gotten));
+                task.onSuccess(this.gotten);
             }
         }
     }
@@ -63,26 +65,34 @@ public class AsyncTaskAttempt<T, Extra> {
                     e.printStackTrace();
                 }
             }
-            return gotten;
         }
+        return gotten;
     }
 
     public void onSuccess(Consumer<T> onSuccess) {
-        synchronized (this.onSuccess) {
-            this.onSuccess.add(onSuccess);
-        }
+        boolean isDone;
         synchronized (this) {
-            if (isComplete && !isLastAttemptFail) onSuccess.accept(this.gotten);
+            isDone = isComplete && !isLastAttemptFail;
         }
+        if (isDone)
+            onSuccess.accept(this.gotten);
+        else
+            synchronized (this.onSuccess) {
+                this.onSuccess.add(onSuccess);
+            }
     }
 
     public void onFailure(Consumer<Exception> onFailure) {
-        synchronized (this.onFailure) {
-            this.onFailure.add(onFailure);
-        }
+        boolean isDone;
         synchronized (this) {
-            if (isComplete && !isLastAttemptFail) onFailure.accept(this.exception);
+            isDone = isComplete && isLastAttemptFail;
         }
+        if (isDone)
+            onFailure.accept(this.exception);
+        else
+            synchronized (this.onFailure) {
+                this.onFailure.add(onFailure);
+            }
     }
 
 

@@ -3,6 +3,7 @@ package apple.utilities.structures.choiceable;
 import java.util.function.Function;
 
 public class ChoiceableFunction<Give, Thing> {
+
     Function<Give, Thing> supplier;
     Thing gotten;
 
@@ -16,7 +17,8 @@ public class ChoiceableFunction<Give, Thing> {
         this.gotten = gotten;
     }
 
-    public static <Give, Thing> ChoiceableFunction<Give, Thing> create(Function<Give, Thing> thing) {
+    public static <Give, Thing> ChoiceableFunction<Give, Thing> create(
+        Function<Give, Thing> thing) {
         return new ChoiceableFunction<>(thing);
     }
 
@@ -26,7 +28,7 @@ public class ChoiceableFunction<Give, Thing> {
 
     public Thing getChoice(Give give) {
         if (gotten == null) {
-            return supplier.apply(give);
+            return this.gotten = supplier.apply(give);
         }
         return gotten;
     }

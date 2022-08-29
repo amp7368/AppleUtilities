@@ -35,7 +35,7 @@ public class TaskHandlerQueue extends TaskHandler<AsyncTaskQueue> {
     @Override
     protected long timeToNextRequest() {
         synchronized (this.oldTasks) {
-            this.trimOldTasks(this.intervalTime);
+            this.trimOldTasks(System.currentTimeMillis() + this.intervalTime);
             int tasksToExpire = this.oldTasks.size() - tasksPerInterval - 1;
             if (tasksToExpire <= 0) return this.safeGuardBuffer;
             return this.calculateTimeToExpire(tasksToExpire);
