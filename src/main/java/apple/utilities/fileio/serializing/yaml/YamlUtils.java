@@ -9,7 +9,8 @@ public interface YamlUtils {
         return new Yaml();
     }
 
-    BaseYcm DEFAULT_YCM = new BaseYcm();
+    BaseYcm DEFAULT_YCM = new BaseYcm() {
+    };
 
     default BaseYcm defaultYcm() {
         return DEFAULT_YCM;

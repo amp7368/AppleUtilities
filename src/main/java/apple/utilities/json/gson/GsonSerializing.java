@@ -3,11 +3,16 @@ package apple.utilities.json.gson;
 import apple.utilities.json.gson.serialize.JsonSerializing;
 import apple.utilities.json.gson.serialize.JsonSerializingWithGson;
 import apple.utilities.structures.choiceable.ChoiceableFunction;
-import com.google.gson.*;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
+@Deprecated
 public class GsonSerializing<Typee> implements JsonSerializing<Typee> {
+
     private final JsonSerializingWithGson<Typee> serializer;
     private final ChoiceableFunction<GsonSerializing<Typee>, Gson> getGsonFinalized;
 

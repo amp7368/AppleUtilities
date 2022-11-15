@@ -5,20 +5,32 @@ import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import apple.utilities.util.FileFormatting;
-
+import com.google.gson.Gson;
 import java.io.File;
 import java.util.Collection;
 
-public class AppleAJDTypedImpl<DBType extends SaveFileable, TaskExtra> extends AppleAJD implements AppleAJDTyped<DBType, TaskExtra> {
+public class AppleAJDTypedImpl<DBType extends SaveFileable, TaskExtra> extends AppleAJD implements
+    AppleAJDTyped<DBType, TaskExtra> {
+
     protected final Class<DBType> dbType;
     protected final File folder;
     protected final AsyncTaskQueueStart<TaskExtra> queue;
 
-    public AppleAJDTypedImpl(Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue) {
+    public AppleAJDTypedImpl(Class<DBType> dbType, File folder,
+        AsyncTaskQueueStart<TaskExtra> queue) {
         this.dbType = dbType;
         this.folder = folder;
         this.queue = queue;
     }
+
+    public AppleAJDTypedImpl(Class<DBType> dbType, File folder,
+        AsyncTaskQueueStart<TaskExtra> queue, Gson gson) {
+        super(gson);
+        this.dbType = dbType;
+        this.folder = folder;
+        this.queue = queue;
+    }
+
 
     @Override
     public boolean delete(DBType deleteThis) {
@@ -52,7 +64,8 @@ public class AppleAJDTypedImpl<DBType extends SaveFileable, TaskExtra> extends A
 
     @Override
     public AsyncTaskAttempt<DBType, TaskExtra> loadFromFolder(String... children) {
-        return this.load(FileFormatting.fileWithChildren(this.folder, children), this.dbType, this.queue);
+        return this.load(FileFormatting.fileWithChildren(this.folder, children), this.dbType,
+            this.queue);
     }
 
     @Override

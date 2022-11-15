@@ -4,13 +4,13 @@ import apple.utilities.structures.Pair;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class GsonBuilderDynamic implements Supplier<Gson> {
+public class GsonBuilderDynamic {
+
     private final List<Pair<Class<?>, Object>> typeHierarchyAdapters = new ArrayList<>();
     private final List<Pair<Type, Object>> typeAdapters = new ArrayList<>();
     private final List<TypeAdapterFactory> typeAdapterFactories = new ArrayList<>();
@@ -28,25 +28,20 @@ public class GsonBuilderDynamic implements Supplier<Gson> {
         this.builderBase = other.builderBase;
     }
 
-    @Override
-    public Gson get() {
-        return create();
-    }
-
     public Gson create() {
-        if (gsonFinal == null) {
-            GsonBuilder builder = builderBase.get();
-            for (Pair<Class<?>, Object> typeAdapter : typeHierarchyAdapters) {
-                builder.registerTypeHierarchyAdapter(typeAdapter.getKey(), typeAdapter.getValue());
-            }
-            for (Pair<Type, Object> typeAdapter : typeAdapters) {
-                builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
-            }
-            for (TypeAdapterFactory typeAdapter : typeAdapterFactories) {
-                builder.registerTypeAdapterFactory(typeAdapter);
-            }
-            this.gsonFinal = builder.create();
+        if (gsonFinal != null)
+            return gsonFinal;
+        GsonBuilder builder = builderBase.get();
+        for (Pair<Class<?>, Object> typeAdapter : typeHierarchyAdapters) {
+            builder.registerTypeHierarchyAdapter(typeAdapter.getKey(), typeAdapter.getValue());
         }
+        for (Pair<Type, Object> typeAdapter : typeAdapters) {
+            builder.registerTypeAdapter(typeAdapter.getKey(), typeAdapter.getValue());
+        }
+        for (TypeAdapterFactory typeAdapter : typeAdapterFactories) {
+            builder.registerTypeAdapterFactory(typeAdapter);
+        }
+        this.gsonFinal = builder.create();
         return gsonFinal;
     }
 

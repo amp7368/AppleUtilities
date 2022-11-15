@@ -1,5 +1,6 @@
 package apple.utilities.json.gson;
 
+@Deprecated
 public record GsonTypeAdapterSimpleMapping<Typee>(String typeId,
                                                   Class<Typee> clazz
 ) implements GsonTypeAdapterSerialization<Typee> {

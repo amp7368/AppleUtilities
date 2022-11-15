@@ -5,22 +5,38 @@ import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.util.supplier.SupplierUncaught;
 import com.google.gson.Gson;
-
 import java.io.File;
 
 public class AppleAJD implements AppleAJDUtil {
-    public static <DBType, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
+
+    public AppleAJD() {
+        setSerializingJson();
+    }
+
+    public AppleAJD(Gson gson) {
+        setSerializingJson(gson);
+    }
+
+    public static <DBType, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(
+        Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
         return new AppleAJDInstImpl<>(dbType, file, queue);
     }
 
-    public static <DBType extends SaveFileable, TaskExtra> AppleAJDTyped<DBType, TaskExtra> createTyped(Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue) {
+    public static <DBType extends SaveFileable, TaskExtra> AppleAJDTyped<DBType, TaskExtra> createTyped(
+        Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue) {
         return new AppleAJDTypedImpl<>(dbType, folder, queue);
     }
 
     private AppleAJDSerializing serializing;
 
-    {
-        setSerializingJson();
+    public static <DBType, TaskExtra> AppleAJDInst<DBType, TaskExtra> createInst(
+        Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue, Gson gson) {
+        return new AppleAJDInstImpl<>(dbType, file, queue, gson);
+    }
+
+    public static <DBType extends SaveFileable, TaskExtra> AppleAJDTyped<DBType, TaskExtra> createTyped(
+        Class<DBType> dbType, File folder, AsyncTaskQueueStart<TaskExtra> queue, Gson gson) {
+        return new AppleAJDTypedImpl<>(dbType, folder, queue, gson);
     }
 
     public void setSerializing(AppleAJDSerializer serializer, AppleAJDDeserializer deserializer) {
@@ -63,15 +79,19 @@ public class AppleAJD implements AppleAJDUtil {
 
     @FunctionalInterface
     public interface AppleAJDSerializer {
+
         <DBType> SupplierUncaught<Placeholder> accept(File file, DBType saveThis);
     }
 
     @FunctionalInterface
     public interface AppleAJDDeserializer {
+
         <DBType> SupplierUncaught<DBType> accept(File file, Class<DBType> saveThis);
     }
 
-    public record AppleAJDSerializing(AppleAJDSerializer serializer, AppleAJDDeserializer deserializer) {
+    public record AppleAJDSerializing(AppleAJDSerializer serializer,
+                                      AppleAJDDeserializer deserializer) {
+
     }
 
 

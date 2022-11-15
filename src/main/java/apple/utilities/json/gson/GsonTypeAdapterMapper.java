@@ -3,21 +3,30 @@ package apple.utilities.json.gson;
 import apple.utilities.json.gson.serialize.JsonSerializingWithGson;
 import apple.utilities.structures.Pair;
 import apple.utilities.structures.choiceable.ChoiceableFunction;
-import com.google.gson.*;
-import org.jetbrains.annotations.Nullable;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
-public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerialization<Typee>> implements JsonSerializingWithGson<Typee> {
+@Deprecated
+public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerialization<Typee>> implements
+    JsonSerializingWithGson<Typee> {
+
     private static final String TYPE_ID = "typeId";
     private final Map<String, Enumm> typesById;
     private final Map<Class<?>, Enumm> typesByClass;
     private final Class<Typee> superClazz;
 
-    protected GsonTypeAdapterMapper(Map<String, Enumm> typesById, Map<Class<?>, Enumm> typesByClass, Class<Typee> superClazz) {
+    protected GsonTypeAdapterMapper(Map<String, Enumm> typesById, Map<Class<?>, Enumm> typesByClass,
+        Class<Typee> superClazz) {
         this.typesById = typesById;
         this.typesByClass = typesByClass;
         this.superClazz = superClazz;
@@ -34,24 +43,26 @@ public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerializa
     }
 
 
-    public static <Typee> GsonTypeAdapterMapper<Typee, GsonTypeAdapterSimpleMapping<Typee>> create(Collection<Pair<String, Class<Typee>>> values, Class<Typee> superClazz) {
+    public static <Typee> GsonTypeAdapterMapper<Typee, GsonTypeAdapterSimpleMapping<Typee>> create(
+        Collection<Pair<String, Class<Typee>>> values, Class<Typee> superClazz) {
         Map<String, GsonTypeAdapterSimpleMapping<Typee>> typesById = new HashMap<>();
         Map<Class<?>, GsonTypeAdapterSimpleMapping<Typee>> typesByClass = new HashMap<>();
         for (Pair<String, Class<Typee>> enumm : values) {
-            GsonTypeAdapterSimpleMapping<Typee> mapping = new GsonTypeAdapterSimpleMapping<>(enumm.getKey(), enumm.getValue());
+            GsonTypeAdapterSimpleMapping<Typee> mapping = new GsonTypeAdapterSimpleMapping<>(
+                enumm.getKey(), enumm.getValue());
             typesById.put(enumm.getKey(), mapping);
             typesByClass.put(enumm.getValue(), mapping);
         }
         return new GsonTypeAdapterMapper<>(typesById, typesByClass, superClazz);
     }
 
-    public static <Typee, Enumm extends GsonTypeAdapterSerialization<Typee>>
-    GsonTypeAdapterMapper<Typee, Enumm> create(Map<String, Enumm> typesById, Map<Class<?>, Enumm> typesByClass, Class<Typee> superClazz) {
+    public static <Typee, Enumm extends GsonTypeAdapterSerialization<Typee>> GsonTypeAdapterMapper<Typee, Enumm> create(
+        Map<String, Enumm> typesById, Map<Class<?>, Enumm> typesByClass, Class<Typee> superClazz) {
         return new GsonTypeAdapterMapper<>(typesById, typesByClass, superClazz);
     }
 
-    public static <Typee, Enumm extends GsonTypeAdapterSerialization<Typee>>
-    GsonTypeAdapterMapper<Typee, Enumm> create(Enumm[] values, Class<Typee> superClazz) {
+    public static <Typee, Enumm extends GsonTypeAdapterSerialization<Typee>> GsonTypeAdapterMapper<Typee, Enumm> create(
+        Enumm[] values, Class<Typee> superClazz) {
         return new GsonTypeAdapterMapper<>(values, superClazz);
     }
 
@@ -64,7 +75,8 @@ public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerializa
     }
 
     @Override
-    public Typee deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context, Gson gson) throws JsonParseException {
+    public Typee deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context,
+        Gson gson) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
         String typeId = json.get(TYPE_ID).getAsString();
         Enumm enumm = this.get(typeId);
@@ -74,7 +86,8 @@ public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerializa
     }
 
     @Override
-    public JsonElement serialize(Typee object, Type type, JsonSerializationContext context, Gson gson) {
+    public JsonElement serialize(Typee object, Type type, JsonSerializationContext context,
+        Gson gson) {
         Class<?> clazz = object.getClass();
         @Nullable Enumm enumm = this.get(clazz);
         if (enumm == null)
@@ -84,8 +97,10 @@ public class GsonTypeAdapterMapper<Typee, Enumm extends GsonTypeAdapterSerializa
         return json;
     }
 
-    public ChoiceableFunction<GsonSerializing<Typee>, Gson> dynamicToFinalized(GsonBuilderDynamic gsonBuilderDynamic) {
-        return ChoiceableFunction.create(serializer -> gsonBuilderDynamic.copy().without(serializer).create());
+    public ChoiceableFunction<GsonSerializing<Typee>, Gson> dynamicToFinalized(
+        GsonBuilderDynamic gsonBuilderDynamic) {
+        return ChoiceableFunction.create(
+            serializer -> gsonBuilderDynamic.copy().without(serializer).create());
     }
 
     @Nullable

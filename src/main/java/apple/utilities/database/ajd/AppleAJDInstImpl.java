@@ -3,6 +3,7 @@ package apple.utilities.database.ajd;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
+import com.google.gson.Gson;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
@@ -15,6 +16,14 @@ public class AppleAJDInstImpl<DBType, TaskExtra> extends AppleAJD implements
     protected DBType thing = null;
 
     public AppleAJDInstImpl(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue) {
+        this.dbType = dbType;
+        this.file = file;
+        this.queue = queue;
+    }
+
+    public AppleAJDInstImpl(Class<DBType> dbType, File file, AsyncTaskQueueStart<TaskExtra> queue,
+        Gson gson) {
+        super(gson);
         this.dbType = dbType;
         this.file = file;
         this.queue = queue;

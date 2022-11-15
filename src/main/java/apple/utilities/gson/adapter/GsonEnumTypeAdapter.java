@@ -23,21 +23,31 @@ public class GsonEnumTypeAdapter<Super> implements JsonSerializing<Super> {
     private final GsonBuilderDynamic originalGson;
     private Gson gsonWithoutThis = null;
 
-    protected GsonEnumTypeAdapter(GsonEnumTypeHolder<Super>[] types, GsonBuilderDynamic gson) {
+    private GsonEnumTypeAdapter(GsonEnumTypeHolder<Super>[] types, GsonBuilderDynamic gson) {
         this.originalGson = gson;
         this.typesByClass = new HashMap<>();
         this.typesById = new HashMap<>();
         this.types = types;
-        for (GsonEnumTypeHolder<Super> enumm : types) {
-            this.typesByClass.put(enumm.getTypeClass(), enumm);
-            this.typesById.put(enumm.getTypeId(), enumm);
+        for (GsonEnumTypeHolder<Super> type : types) {
+            this.typesByClass.put(type.getTypeClass(), type);
+            this.typesById.put(type.getTypeId(), type);
         }
     }
 
+    public static <Super> GsonBuilderDynamic register(GsonEnumTypeHolder<Super>[] types,
+        GsonBuilderDynamic gson, Type superClazz) {
+        gson.registerTypeAdapter(superClazz, new GsonEnumTypeAdapter<>(types, gson));
+        return gson;
+    }
+
+    public static <Super> GsonEnumTypeAdapter<Super> createOnly(GsonEnumTypeHolder<Super>[] types,
+        GsonBuilderDynamic gson) {
+        return new GsonEnumTypeAdapter<>(types, gson);
+    }
 
     @Override
-    public Super deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context)
-        throws JsonParseException {
+    public Super deserialize(JsonElement jsonElement, Type type,
+        JsonDeserializationContext context) {
         verifyGson();
         JsonObject json = jsonElement.getAsJsonObject();
         String typeId = json.get(TYPE_ID).getAsString();
