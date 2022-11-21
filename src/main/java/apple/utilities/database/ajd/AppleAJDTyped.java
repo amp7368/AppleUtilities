@@ -3,26 +3,27 @@ package apple.utilities.database.ajd;
 import apple.utilities.database.SaveFileable;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
-
 import java.io.File;
 import java.util.Collection;
 
-public interface AppleAJDTyped<DBType extends SaveFileable, TaskExtra> extends IAppleAJD {
+public interface AppleAJDTyped<DBType extends SaveFileable> extends AppleAJD<DBType> {
+
     boolean delete(DBType deleteThis);
 
-    void saveInFolderNow(DBType saveThis);
+    boolean saveInFolderNow(DBType saveThis);
 
-    AsyncTaskAttempt<Placeholder, TaskExtra> saveInFolder(DBType saveThis);
+    AsyncTaskAttempt<Placeholder, ?> saveInFolder(DBType saveThis);
 
-    Collection<AsyncTaskAttempt<DBType, TaskExtra>> loadFolder();
+    Collection<AsyncTaskAttempt<DBType, ?>> loadFolder();
 
-    AsyncTaskAttempt<DBType, TaskExtra> loadFromFolder(File file);
+    Collection<DBType> loadFolderNow();
+
+    AsyncTaskAttempt<DBType, ?> loadFromFolder(File file);
+
+    AsyncTaskAttempt<DBType, ?> loadFromFolder(String... children);
 
     DBType loadFromFolderNow(File file);
 
-    AsyncTaskAttempt<DBType, TaskExtra> loadFromFolder(String... children);
-
     DBType loadFromFolderNow(String... children);
 
-    Collection<DBType> loadFolderNow();
 }
