@@ -12,16 +12,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AppleAJDBase<DBType> implements AppleAJD<DBType> {
 
     private static final List<Class<?>> primitives = List.of(String.class, Boolean.class, Character.class, Byte.class, Short.class,
-        Integer.class, Long.class, Float.class, Double.class, Collection.class, Map.class);
+        Integer.class, Long.class, Float.class, Double.class, Collection.class);
 
     protected final AsyncTaskQueueStart<?> queue;
     protected final Class<DBType> dbType;
@@ -36,44 +38,88 @@ public class AppleAJDBase<DBType> implements AppleAJD<DBType> {
 
     // modify 'initial', discard 'loaded'
     protected DBType merge(DBType loaded) {
-        return this.merge(makeNew(), loaded, dbType, 0);
+        return this.mergeAllowSwap(makeNew(), loaded, 0, false);
     }
 
-    protected <T> T merge(T initial, T loaded, Class<?> clazz, int depth) {
-        if (initial == null)
-            return loaded;
-        if (loaded == null)
-            return initial;
-        if (depth > 50) // random arbitrary magic number.
-            return loaded;
-        Set<Field> fields = new HashSet<>() {{
-            addAll(List.of(clazz.getFields()));
-            addAll(List.of(clazz.getDeclaredFields()));
-        }};
-        for (Field field : fields) {
-            mergeField(initial, loaded, depth, field);
+    private <T> T mergeAllowSwap(T mergeOnto, T mergeFrom, int depth, boolean didSwap) {
+        if (mergeOnto == null)
+            return mergeFrom;
+        if (mergeFrom == null)
+            return mergeOnto;
+        if (depth > 50) // arbitrary magic number.
+            return mergeFrom;
+        if (mergeFrom.getClass() != mergeOnto.getClass()) {
+            if (didSwap)
+                return mergeOnto;
+            didSwap = true;
+            T temp = mergeFrom;
+            mergeFrom = mergeOnto;
+            mergeOnto = temp;
         }
-        return initial;
+        for (Field field : getFields(mergeOnto.getClass())) {
+            if (isFieldIgnored(field))
+                continue;
+            field.trySetAccessible();
+            Object val = mergeField(mergeOnto, mergeFrom, depth, field, didSwap);
+            if (val == null)
+                continue;
+            try {
+                field.set(mergeOnto, val);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return mergeOnto;
     }
 
-    private <T> void mergeField(T initial, T loaded, int depth, Field field) {
-        if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers()))
-            return;
-        field.trySetAccessible();
+    private boolean isFieldIgnored(Field field) {
+        return Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers());
+    }
+
+    @NotNull
+    private Set<Field> getFields(Class<?> clazz) {
+        Set<Field> fields = new HashSet<>();
+        fields.addAll(List.of(clazz.getFields()));
+        fields.addAll(List.of(clazz.getDeclaredFields()));
+        return fields;
+    }
+
+    private <T> Object mergeField(T initial, T loaded, int depth, Field field, boolean didSwap) {
         try {
             Object initialFieldVal = field.get(initial);
-            Object loadedFieldVal = field.get(loaded);
-            if (loadedFieldVal == null)
-                // keep initial
-                return;
-            if (initialFieldVal == null || this.isValueSimple(field.getType())) {
-                field.set(initial, loadedFieldVal);
+            Field loadedField;
+            try {
+                loadedField = loaded.getClass().getDeclaredField(field.getName());
+            } catch (NoSuchFieldException e) {
+                loadedField = loaded.getClass().getField(field.getName());
+            }
+            loadedField.trySetAccessible();
+            Object loadedFieldVal = loadedField.get(loaded);
+
+            if (loadedFieldVal == null) {
+                return initialFieldVal;
+            } else if (initialFieldVal == null) {
+                return loadedFieldVal;
+            } else if (this.isValueSimple(field.getType())) {
+                return loadedFieldVal;
+            } else if (this.isMap(field.getType())) {
+                Map<Object, Object> map = new HashMap<>();
+                map.putAll((Map<?, ?>) initialFieldVal);
+                map.putAll((Map<?, ?>) loadedFieldVal);
+                return map;
             } else {
-                this.merge(initialFieldVal, loadedFieldVal, field.getType(), depth + 1);
+                return this.mergeAllowSwap(initialFieldVal, loadedFieldVal, depth + 1, didSwap);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            // might be different classes
         }
+        return null;
+    }
+
+    private boolean isMap(Class<?> fieldType) {
+        return Map.class.isAssignableFrom(fieldType);
     }
 
     private boolean isValueSimple(Class<?> fieldType) {
