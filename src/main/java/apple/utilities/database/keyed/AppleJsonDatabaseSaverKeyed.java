@@ -1,5 +1,6 @@
 package apple.utilities.database.keyed;
 
+import apple.utilities.database.SaveFileable;
 import apple.utilities.database.SaveFileableKeyed;
 import apple.utilities.request.AppleJsonToFile;
 import apple.utilities.request.AppleRequestService;

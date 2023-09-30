@@ -6,11 +6,12 @@ import apple.utilities.request.keyed.AppleRequestKeyQueue;
 import apple.utilities.request.settings.RequestSettingsBuilder;
 import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import com.google.gson.Gson;
-
 import java.io.File;
 
 @Deprecated
-public interface AppleJsonDatabaseManagerKeyed<DBType extends SaveFileableKeyed> extends AppleJsonDatabaseSaverKeyed<DBType>, AppleJsonDatabaseLoaderKeyed<DBType> {
+public interface AppleJsonDatabaseManagerKeyed<DBType extends SaveFileableKeyed> extends AppleJsonDatabaseSaverKeyed<DBType>,
+    AppleJsonDatabaseLoaderKeyed<DBType> {
+
     @Override
     Class<DBType> getDbClass();
 

@@ -1,6 +1,6 @@
 package apple.utilities.database.queue;
 
-import apple.utilities.database.SaveFileable;
+import apple.utilities.database.HasFilename;
 import apple.utilities.util.FileFormatting;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 @Deprecated
-public interface AppleJsonDatabaseManager<DBType extends SaveFileable> extends AppleJsonDatabaseSaver<DBType>, AppleJsonDatabaseLoader<DBType> {
+public interface AppleJsonDatabaseManager<DBType extends HasFilename> extends AppleJsonDatabaseSaver<DBType>, AppleJsonDatabaseLoader<DBType> {
     @NotNull
     static File getDBFolder(Class<?> mainClass) {
         return FileFormatting.getDBFolder(mainClass);

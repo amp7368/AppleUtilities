@@ -2,10 +2,7 @@ package apple.utilities.database;
 
 import apple.utilities.util.FileFormatting;
 
-import java.io.File;
-
-public interface SaveFileable extends FileFormatting {
-    String getSaveFileName();
+public interface SaveFileable extends HasFilename, FileFormatting {
 
     default String extension(String file, String extension) {
         return this.extensionI(file, extension);
@@ -21,13 +18,5 @@ public interface SaveFileable extends FileFormatting {
 
     default String extensionDb(String file) {
         return this.extensionDbI(file);
-    }
-
-    default File fileWithParent(File parentFile) {
-        return this.fileWithChildrenI(parentFile, getSaveFilePath());
-    }
-
-    default String[] getSaveFilePath() {
-        return new String[]{getSaveFileName()};
     }
 }

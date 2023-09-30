@@ -9,16 +9,17 @@ import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import apple.utilities.threading.service.base.task.AsyncTaskLife;
 import apple.utilities.threading.service.base.task.OldTask;
 import apple.utilities.threading.util.supplier.SupplierUncaught;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class TaskHandler<TaskExtra> implements TaskHandlerOverload<TaskExtra> {
+
     protected final Object isRunningLock = new Object();
     protected final Collection<OldTask<?>> oldTasks = new ArrayList<>();
+    private final RateLimit rateLimit = new RateLimit();
     private boolean isRunningRequests = false;
     private @Nullable AsyncTaskAttempt<?, TaskExtra> nextTask = null;
 
@@ -95,7 +96,7 @@ public abstract class TaskHandler<TaskExtra> implements TaskHandlerOverload<Task
     }
 
     private void doSleep() {
-        long timeToNextRequest = this.timeToNextRequest();
+        long timeToNextRequest = Math.max(this.rateLimit.getDelay(), this.timeToNextRequest());
         if (timeToNextRequest <= 0) return;
         try {
             Thread.sleep(timeToNextRequest);
@@ -146,5 +147,9 @@ public abstract class TaskHandler<TaskExtra> implements TaskHandlerOverload<Task
 
     private <T> AsyncTaskAttempt<T, TaskExtra> newAttempt(AsyncTaskLife<T, TaskExtra> taskLife) {
         return new AsyncTaskAttempt<>(taskLife);
+    }
+
+    private RateLimit getRateLimit() {
+        return this.rateLimit;
     }
 }
