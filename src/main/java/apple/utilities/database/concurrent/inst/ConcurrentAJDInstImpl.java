@@ -1,28 +1,24 @@
 package apple.utilities.database.concurrent.inst;
 
 import apple.utilities.database.concurrent.base.ConcurrentAJDBaseImpl;
-import apple.utilities.database.concurrent.util.TakeLastOpAsync;
-import apple.utilities.database.util.ReflectionsUtil;
+import apple.utilities.database.concurrent.util.AJDFileOpAsync;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ConcurrentAJDInstImpl<DBType> extends ConcurrentAJDBaseImpl<DBType> implements ConcurrentAJDInst<DBType> {
 
     protected final File file;
-    private final TakeLastOpAsync<String, Boolean> saveOp;
+    private final AJDFileOpAsync saveOp;
     protected DBType thing = null;
 
     public ConcurrentAJDInstImpl(Class<DBType> dbType, File file, Executor executor) {
         super(dbType, executor);
         this.file = file;
-        this.saveOp = new TakeLastOpAsync<>(this::writeToFile, executor);
+        this.saveOp = new AJDFileOpAsync(this::writeToFile, executor);
     }
 
     @Override
@@ -38,29 +34,24 @@ public class ConcurrentAJDInstImpl<DBType> extends ConcurrentAJDBaseImpl<DBType>
 
     @Override
     public boolean saveNow() {
-        String serialized = serializing.serialize(this.thing);
-        return this.saveOp.completeNow(serialized);
+        return this.saveOp.completeNow(serializing.serialize(this.thing));
     }
 
     @Override
-    public Future<Boolean> save() {
+    public CompletableFuture<Boolean> save() {
         String serialized = serializing.serialize(this.thing);
         return this.saveOp.tryStart(serialized);
     }
 
     @Override
-    public Future<DBType> load() {
+    public CompletableFuture<DBType> load() {
         return CompletableFuture.supplyAsync(this::loadNow, executor);
     }
 
     @Override
     @NotNull
     public DBType uncheckedLoadNow(boolean safeMode) throws IOException {
-        this.setValue(serializing().deserialize(this.file, this.dbType));
-        if (!safeMode)
-            this.setValue(mergeOntoNew(this.thing));
-        else if (this.thing == null)
-            this.setValue(ReflectionsUtil.makeNew(this.dbType));
+        this.setValue(uncheckedLoadNow(this.file, safeMode));
         this.save();
         return this.thing;
     }
@@ -69,7 +60,7 @@ public class ConcurrentAJDInstImpl<DBType> extends ConcurrentAJDBaseImpl<DBType>
     @Nullable
     public DBType loadNow(boolean safeMode) {
         try {
-            this.setValue(uncheckedLoadNow());
+            this.uncheckedLoadNow(safeMode);
         } catch (Exception e) {
             System.err.println("Error loading " + this.dbType.getName());
             e.printStackTrace();
@@ -80,11 +71,6 @@ public class ConcurrentAJDInstImpl<DBType> extends ConcurrentAJDBaseImpl<DBType>
 
     @NotNull
     private Boolean writeToFile(String serialized) {
-        try {
-            Files.writeString(file.toPath(), serialized, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+        return writeToFile(this.file, serialized);
     }
 }

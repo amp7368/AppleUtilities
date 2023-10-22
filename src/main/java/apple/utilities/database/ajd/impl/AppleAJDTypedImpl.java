@@ -80,7 +80,7 @@ public class AppleAJDTypedImpl<DBType extends HasFilename> extends AppleAJDBase<
 
     private void logError(Exception e) {
         e.printStackTrace();
-        System.err.println("Error loading " + dbType.getName());
+        System.err.println("Error loading " + this.dbType.getName());
     }
 
     public AsyncTaskAttempt<DBType, ?> loadFromFolder(File children) {

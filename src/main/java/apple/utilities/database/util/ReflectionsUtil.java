@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.rmi.AccessException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ public class ReflectionsUtil {
         return mergeAllowSwap(created, mergeFrom, 0);
     }
 
-    public static <T> T mergeAllowSwap(T mergeOnto, T mergeFrom, int depth) throws AccessException {
+    private static <T> T mergeAllowSwap(T mergeOnto, T mergeFrom, int depth) throws TieredAccessException {
         if (mergeOnto == null)
             return mergeFrom;
         if (mergeFrom == null)
@@ -38,9 +39,18 @@ public class ReflectionsUtil {
                 String msg = "Field '%s' of class '%s' is inaccessible for reflection %n".formatted(
                     field.getName(),
                     mergeOnto.getClass().getCanonicalName());
-                throw new AccessException(msg);
+                throw new TieredAccessException(msg);
             }
-            Object val = mergeField(mergeOnto, mergeFrom, depth, field);
+            Object val;
+            try {
+                val = mergeField(mergeOnto, mergeFrom, depth, field);
+            } catch (TieredAccessException e) {
+                String msg = "Failed to update field '%s' of class '%s'".formatted(
+                    mergeOnto.getClass().getCanonicalName(),
+                    field.getType().getCanonicalName());
+                e.pushMsg(msg);
+                throw e;
+            }
             if (val == null)
                 continue;
 
@@ -50,7 +60,7 @@ public class ReflectionsUtil {
                 String msg = "Field '%s' of class '%s' could not be set using reflection (even after setting accessible)".formatted(
                     field.getName(),
                     mergeOnto.getClass().getCanonicalName());
-                throw new AccessException(msg, e);
+                throw new TieredAccessException(msg, e);
             }
         }
         return mergeOnto;
@@ -69,7 +79,7 @@ public class ReflectionsUtil {
         return fields;
     }
 
-    private static <T> Object mergeField(T initial, T loaded, int depth, Field field) throws AccessException {
+    private static <T> Object mergeField(T initial, T loaded, int depth, Field field) throws TieredAccessException {
         Object initialFieldVal = null;
         try {
             initialFieldVal = field.get(initial);
@@ -107,7 +117,7 @@ public class ReflectionsUtil {
     }
 
     private static boolean isMap(Class<?> fieldType) {
-        return HashMap.class == fieldType;
+        return fieldType == HashMap.class || fieldType == Map.class;
     }
 
     private static boolean isValueSimple(Class<?> fieldType) {
@@ -119,6 +129,30 @@ public class ReflectionsUtil {
             return type.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new IllegalStateException("There is not a no-args constructor in " + type.getName(), e);
+        }
+    }
+
+    private static class TieredAccessException extends AccessException {
+
+        private final List<String> stackOfMsgs = new ArrayList<>();
+
+        public TieredAccessException(String msg) {
+            super(msg);
+            this.pushMsg(msg);
+        }
+
+        public TieredAccessException(String msg, Exception cause) {
+            super(msg, cause);
+            this.pushMsg(msg);
+        }
+
+        public void pushMsg(String msg) {
+            this.stackOfMsgs.add(0, msg);
+        }
+
+        @Override
+        public String getMessage() {
+            return String.join(" Caused by:\n", stackOfMsgs);
         }
     }
 }

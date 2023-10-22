@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 
-public class TakeLastOpAsync<A, R> {
+public class AJDFileOpAsyncBase<A, R> {
 
     private final Executor executor;
     private final Function<A, R> asyncOp;
@@ -16,7 +16,7 @@ public class TakeLastOpAsync<A, R> {
     private A queuedArg;
     private boolean waitToStart = false;
 
-    public TakeLastOpAsync(Function<A, R> asyncOp, Executor executor) {
+    public AJDFileOpAsyncBase(Function<A, R> asyncOp, Executor executor) {
         this.asyncOp = asyncOp;
         this.executor = executor;
     }
@@ -68,9 +68,9 @@ public class TakeLastOpAsync<A, R> {
             this.queuedArg = null;
         }
         try {
-            opToWait.get();
+            if (opToWait != null) opToWait.get();
             R returnVal = this.asyncOp.apply(arg);
-            opToReturn.complete(returnVal);
+            if (opToReturn != null) opToReturn.complete(returnVal);
             return returnVal;
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);

@@ -1,9 +1,10 @@
 package apple.utilities.database.concurrent.inst;
 
+import apple.utilities.database.concurrent.base.ConcurrentAJDBase;
 import java.io.IOException;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
-public interface ConcurrentAJDInst<DBType> {
+public interface ConcurrentAJDInst<DBType> extends ConcurrentAJDBase<DBType> {
 
     DBType getValue();
 
@@ -11,9 +12,9 @@ public interface ConcurrentAJDInst<DBType> {
 
     boolean saveNow();
 
-    Future<Boolean> save();
+    CompletableFuture<Boolean> save();
 
-    Future<DBType> load();
+    CompletableFuture<DBType> load();
 
     default DBType uncheckedLoadNow() throws IOException {
         return uncheckedLoadNow(false);
