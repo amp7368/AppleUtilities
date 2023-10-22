@@ -7,11 +7,11 @@ import apple.utilities.request.keyed.AppleRequestOnConflict;
 import apple.utilities.request.settings.RequestSettingsBuilder;
 import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import com.google.gson.Gson;
-
 import java.io.File;
 
 @Deprecated
 public class AppleJsonDatabaseKeyed<DBType extends SaveFileableKeyed> implements AppleJsonDatabaseManagerKeyed<DBType> {
+
     private final Class<DBType> dbClass;
     private final File dbFolder;
     private final AppleRequestQueue loadingService;
@@ -22,13 +22,13 @@ public class AppleJsonDatabaseKeyed<DBType extends SaveFileableKeyed> implements
     private final AppleRequestOnConflict<Boolean> onConflict;
 
     public AppleJsonDatabaseKeyed(Class<DBType> dbClass,
-                                  File dbFolder,
-                                  AppleRequestQueue loadingService,
-                                  AppleRequestKeyQueue<Boolean> savingService,
-                                  Gson gson,
-                                  RequestSettingsBuilderVoid savingSettings,
-                                  RequestSettingsBuilder<DBType> loadingSettings,
-                                  AppleRequestOnConflict<Boolean> onConflict) {
+        File dbFolder,
+        AppleRequestQueue loadingService,
+        AppleRequestKeyQueue<Boolean> savingService,
+        Gson gson,
+        RequestSettingsBuilderVoid savingSettings,
+        RequestSettingsBuilder<DBType> loadingSettings,
+        AppleRequestOnConflict<Boolean> onConflict) {
         this.dbClass = dbClass;
         this.dbFolder = dbFolder;
         this.loadingService = loadingService;

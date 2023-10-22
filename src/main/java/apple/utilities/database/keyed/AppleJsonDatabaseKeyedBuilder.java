@@ -7,10 +7,11 @@ import apple.utilities.request.keyed.AppleRequestOnConflict;
 import apple.utilities.request.settings.RequestSettingsBuilder;
 import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import com.google.gson.Gson;
-
 import java.io.File;
+
 @Deprecated
 public class AppleJsonDatabaseKeyedBuilder<DBType extends SaveFileableKeyed> {
+
     private Class<DBType> dbClass;
     private File dbFolder;
     private AppleRequestQueue loadingService;
@@ -21,10 +22,10 @@ public class AppleJsonDatabaseKeyedBuilder<DBType extends SaveFileableKeyed> {
     private AppleRequestOnConflict<Boolean> onConflict;
 
     public AppleJsonDatabaseKeyedBuilder(Class<DBType> dbClass,
-                                         File dbFolder,
-                                         AppleRequestQueue loadingService,
-                                         AppleRequestKeyQueue<Boolean> savingService,
-                                         AppleRequestOnConflict<Boolean> onConflict) {
+        File dbFolder,
+        AppleRequestQueue loadingService,
+        AppleRequestKeyQueue<Boolean> savingService,
+        AppleRequestOnConflict<Boolean> onConflict) {
         this.dbClass = dbClass;
         this.dbFolder = dbFolder;
         this.loadingService = loadingService;
@@ -41,17 +42,17 @@ public class AppleJsonDatabaseKeyedBuilder<DBType extends SaveFileableKeyed> {
 
     public static <DBType extends SaveFileableKeyed>
     AppleJsonDatabaseKeyedBuilder<DBType> required(Class<DBType> dbClass,
-                                                   File dbFolder,
-                                                   AppleRequestQueue loadingService,
-                                                   AppleRequestKeyQueue<Boolean> savingService,
-                                                   AppleRequestOnConflict<Boolean> onConflict) {
+        File dbFolder,
+        AppleRequestQueue loadingService,
+        AppleRequestKeyQueue<Boolean> savingService,
+        AppleRequestOnConflict<Boolean> onConflict) {
         return new AppleJsonDatabaseKeyedBuilder<>(dbClass, dbFolder, loadingService, savingService, onConflict);
     }
 
     public AppleJsonDatabaseKeyedBuilder<DBType> withRequired(Class<DBType> dbClass,
-                                                              File dbFolder,
-                                                              AppleRequestQueue loadingService,
-                                                              AppleRequestKeyQueue<Boolean> savingService) {
+        File dbFolder,
+        AppleRequestQueue loadingService,
+        AppleRequestKeyQueue<Boolean> savingService) {
         this.dbClass = dbClass;
         this.dbFolder = dbFolder;
         this.loadingService = loadingService;
@@ -102,7 +103,9 @@ public class AppleJsonDatabaseKeyedBuilder<DBType extends SaveFileableKeyed> {
 
     public AppleJsonDatabaseKeyed<DBType> create() {
         if (dbClass == null || dbFolder == null || loadingService == null || savingService == null)
-            throw new NullPointerException("Database requires [dbClass || dbFolder || loadingService || savingService] to not be null");
-        return new AppleJsonDatabaseKeyed<>(dbClass, dbFolder, loadingService, savingService, gson, savingSettings, loadingSettings, onConflict);
+            throw new NullPointerException(
+                "Database requires [dbClass || dbFolder || loadingService || savingService] to not be null");
+        return new AppleJsonDatabaseKeyed<>(dbClass, dbFolder, loadingService, savingService, gson, savingSettings, loadingSettings,
+            onConflict);
     }
 }

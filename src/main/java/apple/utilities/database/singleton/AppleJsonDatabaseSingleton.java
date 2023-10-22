@@ -1,6 +1,6 @@
 package apple.utilities.database.singleton;
 
-import apple.utilities.database.SaveFileable;
+import apple.utilities.database.HasFilename;
 import apple.utilities.database.queue.AppleJsonDatabaseManager;
 import apple.utilities.request.AppleRequestQueue;
 import apple.utilities.request.settings.RequestSettingsBuilder;
@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import java.io.File;
 
 @Deprecated
-public class AppleJsonDatabaseSingleton<DBType extends SaveFileable> implements AppleJsonDatabaseManager<DBType> {
+public class AppleJsonDatabaseSingleton<DBType extends HasFilename> implements AppleJsonDatabaseManager<DBType> {
     private final RequestSettingsBuilder<DBType> loadingSettings;
     private final File dbFolder;
     private final AppleRequestQueue ioService;

@@ -1,6 +1,7 @@
 package apple.utilities.database.ajd.impl;
 
 import apple.utilities.database.ajd.AppleAJDInst;
+import apple.utilities.database.util.ReflectionsUtil;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
@@ -33,6 +34,7 @@ public class AppleAJDInstImpl<DBType> extends AppleAJDBase<DBType> implements Ap
             this.serializer().get();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -52,25 +54,23 @@ public class AppleAJDInstImpl<DBType> extends AppleAJDBase<DBType> implements Ap
             e.printStackTrace();
             System.err.println("Error loading " + this.dbType.getName());
         }
-        save();
+        saveNow();
         return this.thing;
     }
 
     @Override
-    public DBType loadOrMake() {
+    public DBType loadOrMake(boolean safeMode) {
         try {
-            this.thing = merge(this.deserializer().get());
+            this.thing = deserializer().get();
+            if (!safeMode)
+                this.thing = merge(this.thing);
+            else if (this.thing == null) this.thing = ReflectionsUtil.makeNew(this.dbType);
         } catch (Exception e) {
-            e.printStackTrace();
             System.err.println("Error loading " + this.dbType.getName());
+            e.printStackTrace();
         }
-        save();
+        saveNow();
         return this.thing;
-    }
-
-    @Override
-    public DBType makeNew() {
-        return super.makeNew();
     }
 
     private SupplierUncaught<Placeholder> serializer() {

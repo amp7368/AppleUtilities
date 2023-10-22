@@ -35,8 +35,8 @@ public interface HasAppleAJDInst<DBType> extends AppleAJDInst<DBType> {
     }
 
     @Override
-    default DBType loadOrMake() {
-        return get().loadOrMake();
+    default DBType loadOrMake(boolean safeMode) {
+        return get().loadOrMake(safeMode);
     }
 
     @Override

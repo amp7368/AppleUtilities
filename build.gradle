@@ -33,7 +33,7 @@ publishing {
     }
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         cacheDynamicVersionsFor 1, 'seconds'
         cacheChangingModulesFor 1, 'seconds'

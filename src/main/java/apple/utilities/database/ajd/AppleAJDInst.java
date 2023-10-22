@@ -15,7 +15,11 @@ public interface AppleAJDInst<DBType> extends AppleAJD<DBType> {
 
     DBType loadNow();
 
-    DBType loadOrMake();
+    default DBType loadOrMake() {
+        return loadOrMake(false);
+    }
+
+    DBType loadOrMake(boolean safeMode);
 
     DBType getInstance();
 }

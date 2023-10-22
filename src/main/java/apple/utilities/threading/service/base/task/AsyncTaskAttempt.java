@@ -3,6 +3,7 @@ package apple.utilities.threading.service.base.task;
 import apple.utilities.threading.service.base.failure.TaskFailureProcedure;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +13,7 @@ public class AsyncTaskAttempt<T, Extra> {
     private final AsyncTaskLife<T, Extra> task;
     private final List<Consumer<T>> onSuccess = new ArrayList<>(1);
     private final List<Consumer<Exception>> onFailure = new ArrayList<>(1);
+    private final CompletableFuture<T> future = new CompletableFuture<>();
     private boolean isComplete = false;
     private T gotten = null;
     private boolean isLastAttemptFail = true;
@@ -41,7 +43,11 @@ public class AsyncTaskAttempt<T, Extra> {
             this.isLastAttemptFail = wasFail;
             this.exception = exceptionTemp;
             this.isComplete = true;
-            this.notifyAll();
+            if (this.isLastAttemptFail) this.future.completeExceptionally(exception);
+            else {
+                this.notifyAll();
+                this.future.completeAsync(() -> this.gotten);
+            }
         }
         if (wasFail) {
             synchronized (onFailure) {
@@ -50,10 +56,14 @@ public class AsyncTaskAttempt<T, Extra> {
             }
         } else {
             synchronized (onSuccess) {
-                onSuccess.forEach((c) -> c.accept(this.gotten));
+//                onSuccess.forEach((c) -> c.accept(this.gotten));
                 task.onSuccess(this.gotten);
             }
         }
+    }
+
+    public CompletableFuture<T> toFuture() {
+        return future;
     }
 
     public T complete() {
@@ -70,16 +80,18 @@ public class AsyncTaskAttempt<T, Extra> {
     }
 
     public void onSuccess(Consumer<T> onSuccess) {
-        boolean isDone;
-        synchronized (this) {
-            isDone = isComplete && !isLastAttemptFail;
-        }
-        if (isDone)
-            onSuccess.accept(this.gotten);
-        else
-            synchronized (this.onSuccess) {
-                this.onSuccess.add(onSuccess);
-            }
+        //todo test
+        this.future.thenAccept(onSuccess);
+//        boolean isDone;
+//        synchronized (this) {
+//            isDone = isComplete && !isLastAttemptFail;
+//        }
+//        if (isDone)
+//            onSuccess.accept(this.gotten);
+//        else
+//            synchronized (this.onSuccess) {
+//                this.onSuccess.add(onSuccess);
+//            }
     }
 
     public void onFailure(Consumer<Exception> onFailure) {

@@ -76,7 +76,7 @@ public class GsonEnumTypeAdapter<Super> implements JsonSerializing<Super> {
     public GsonEnumTypeHolder<Super> getOrThrow(String typeId) {
         GsonEnumTypeHolder<Super> get = typesById.get(typeId);
         if (get == null)
-            throw new JsonParseException(String.format("TypeId '%s' is not set" + typeId));
+            throw new JsonParseException(String.format("TypeId '%s' is not set", typeId));
         return get;
     }
 
@@ -84,7 +84,7 @@ public class GsonEnumTypeAdapter<Super> implements JsonSerializing<Super> {
     public GsonEnumTypeHolder<Super> getOrThrow(Class<?> typeId) {
         GsonEnumTypeHolder<Super> get = typesByClass.get(typeId);
         if (get == null)
-            throw new JsonParseException(String.format("TypeId '%s' is not set" + typeId));
+            throw new JsonParseException(String.format("TypeId '%s' is not set", typeId));
         return get;
     }
 }

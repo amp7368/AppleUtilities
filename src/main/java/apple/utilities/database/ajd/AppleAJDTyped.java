@@ -1,12 +1,12 @@
 package apple.utilities.database.ajd;
 
-import apple.utilities.database.SaveFileable;
+import apple.utilities.database.HasFilename;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import java.io.File;
 import java.util.Collection;
 
-public interface AppleAJDTyped<DBType extends SaveFileable> extends AppleAJD<DBType> {
+public interface AppleAJDTyped<DBType extends HasFilename> extends AppleAJD<DBType> {
 
     boolean delete(DBType deleteThis);
 
@@ -16,7 +16,11 @@ public interface AppleAJDTyped<DBType extends SaveFileable> extends AppleAJD<DBT
 
     Collection<AsyncTaskAttempt<DBType, ?>> loadFolder();
 
-    Collection<DBType> loadFolderNow();
+    default Collection<DBType> loadFolderNow() {
+        return loadFolderNow(false);
+    }
+
+    Collection<DBType> loadFolderNow(boolean safeMode);
 
     AsyncTaskAttempt<DBType, ?> loadFromFolder(File file);
 

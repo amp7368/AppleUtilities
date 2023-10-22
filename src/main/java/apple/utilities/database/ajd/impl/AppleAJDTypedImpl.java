@@ -1,6 +1,6 @@
 package apple.utilities.database.ajd.impl;
 
-import apple.utilities.database.SaveFileable;
+import apple.utilities.database.HasFilename;
 import apple.utilities.database.ajd.AppleAJDTyped;
 import apple.utilities.structures.empty.Placeholder;
 import apple.utilities.threading.service.base.create.AsyncTaskQueueStart;
@@ -8,11 +8,12 @@ import apple.utilities.threading.service.base.task.AsyncTaskAttempt;
 import apple.utilities.threading.util.supplier.SupplierUncaught;
 import apple.utilities.util.FileFormatting;
 import java.io.File;
+import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public class AppleAJDTypedImpl<DBType extends SaveFileable> extends AppleAJDBase<DBType> implements AppleAJDTyped<DBType> {
+public class AppleAJDTypedImpl<DBType extends HasFilename> extends AppleAJDBase<DBType> implements AppleAJDTyped<DBType> {
 
     protected final File folder;
 
@@ -38,6 +39,7 @@ public class AppleAJDTypedImpl<DBType extends SaveFileable> extends AppleAJDBase
             this.serializer(saveThis).get();
             return true;
         } catch (Exception e) {
+            logError(e);
             return false;
         }
     }
@@ -52,7 +54,7 @@ public class AppleAJDTypedImpl<DBType extends SaveFileable> extends AppleAJDBase
         return tasks;
     }
 
-    public Collection<DBType> loadFolderNow() {
+    public Collection<DBType> loadFolderNow(boolean safeMode) {
         File[] files = folder.listFiles();
         if (files == null)
             return Collections.emptyList();
@@ -64,14 +66,21 @@ public class AppleAJDTypedImpl<DBType extends SaveFileable> extends AppleAJDBase
             } catch (Exception e) {
                 logError(e);
             }
-            dbs.add(merge(out));
+            if (safeMode) dbs.add(out);
+            else {
+                try {
+                    dbs.add(merge(out));
+                } catch (AccessException e) {
+                    logError(e);
+                }
+            }
         }
         return dbs;
     }
 
     private void logError(Exception e) {
         e.printStackTrace();
-        System.err.println("Error loading " + dbType.getName());
+        System.err.println("Error loading " + this.dbType.getName());
     }
 
     public AsyncTaskAttempt<DBType, ?> loadFromFolder(File children) {
