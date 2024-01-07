@@ -25,7 +25,7 @@ public class ReflectionsUtil {
     }
 
     public static <T> T merge(Class<T> mergeOnto, T mergeFrom, ReflectionsMergeOptions options) throws AccessException {
-        return merge(makeNew(mergeOnto), mergeFrom, options);
+        return merge(makeNew(mergeOnto), mergeFrom);
     }
 
     public static <T> T merge(T mergeOnto, T mergeFrom) throws AccessException {
@@ -91,6 +91,8 @@ public class ReflectionsUtil {
         Set<Field> fields = new HashSet<>();
         fields.addAll(List.of(clazz.getFields()));
         fields.addAll(List.of(clazz.getDeclaredFields()));
+        Class<?> parent = clazz.getSuperclass();
+        if (parent != null) fields.addAll(getFields(parent));
         return fields;
     }
 
@@ -98,21 +100,14 @@ public class ReflectionsUtil {
         throws TieredAccessException {
         Object initialFieldVal = null;
         try {
+            String fieldName = field.getName();
             initialFieldVal = field.get(initial);
-            Field loadedField;
-            try {
-                loadedField = loaded.getClass().getDeclaredField(field.getName());
-            } catch (NoSuchFieldException e) {
-                loadedField = loaded.getClass().getField(field.getName());
-            }
-            loadedField.trySetAccessible();
+            Field loadedField = getField(loaded.getClass(), fieldName);
             Object loadedFieldVal = loadedField.get(loaded);
 
             if (loadedFieldVal == null) {
                 return initialFieldVal;
             } else if (initialFieldVal == null) {
-                return loadedFieldVal;
-            } else if (isValueSimple(field.getType())) {
                 return loadedFieldVal;
             } else if (isMap(field.getType())) {
                 try {
@@ -122,9 +117,11 @@ public class ReflectionsUtil {
                         depth,
                         options);
                 } catch (AccessException e) {
-                    String msg = "Unable to merge field %s".formatted(field.getName());
+                    String msg = "Unable to merge field %s".formatted(fieldName);
                     throw new TieredAccessException(msg, e);
                 }
+            } else if (isValueSimple(field.getType())) {
+                return loadedFieldVal;
             } else {
                 if (Modifier.isTransient(field.getModifiers())) return loadedFieldVal;
                 return merge(initialFieldVal, loadedFieldVal, depth + 1, options);
@@ -136,6 +133,27 @@ public class ReflectionsUtil {
             // might be different classes
         }
         return initialFieldVal;
+    }
+
+    @NotNull
+    private static <T> Field getField(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+        Field field = null;
+        try {
+            field = clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException ignored) {
+        }
+        try {
+            if (field == null) field = clazz.getField(fieldName);
+        } catch (NoSuchFieldException ignored) {
+        }
+        if (field != null) {
+            field.trySetAccessible();
+            return field;
+        }
+        Class<?> parent = clazz.getSuperclass();
+        if (parent == null)
+            throw new NoSuchFieldException("Field '%s' not found".formatted(fieldName));
+        return getField(parent, fieldName);
     }
 
     private static boolean isMap(Class<?> fieldType) {
