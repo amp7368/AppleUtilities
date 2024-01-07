@@ -6,7 +6,6 @@ plugins {
 repositories {
     maven { url "https://reposilite.appleptr16.com/appleptr16" }
     mavenCentral()
-    mavenLocal()
 }
 java {
     toolchain {

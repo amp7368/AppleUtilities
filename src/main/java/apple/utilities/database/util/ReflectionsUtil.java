@@ -1,5 +1,6 @@
 package apple.utilities.database.util;
 
+import apple.utilities.database.util.merge.ReflectionsMergeOptions;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 public class ReflectionsUtil {
@@ -19,11 +21,24 @@ public class ReflectionsUtil {
         Integer.class, Long.class, Float.class, Double.class, Collection.class);
 
     public static <T> T merge(Class<T> mergeOnto, T mergeFrom) throws AccessException {
-        T created = makeNew(mergeOnto);
-        return mergeAllowSwap(created, mergeFrom, 0);
+        return merge(makeNew(mergeOnto), mergeFrom);
     }
 
-    private static <T> T mergeAllowSwap(T mergeOnto, T mergeFrom, int depth) throws TieredAccessException {
+    public static <T> T merge(Class<T> mergeOnto, T mergeFrom, ReflectionsMergeOptions options) throws AccessException {
+        return merge(makeNew(mergeOnto), mergeFrom, options);
+    }
+
+    public static <T> T merge(T mergeOnto, T mergeFrom) throws AccessException {
+        return merge(mergeOnto, mergeFrom, 0, new ReflectionsMergeOptions());
+    }
+
+    public static <T> T merge(T mergeOnto, T mergeFrom, ReflectionsMergeOptions options) throws AccessException {
+        return merge(mergeOnto, mergeFrom, 0, options);
+    }
+
+    @Internal
+    public static <T> T merge(T mergeOnto, T mergeFrom, int depth, ReflectionsMergeOptions options)
+        throws TieredAccessException {
         if (mergeOnto == null)
             return mergeFrom;
         if (mergeFrom == null)
@@ -43,7 +58,7 @@ public class ReflectionsUtil {
             }
             Object val;
             try {
-                val = mergeField(mergeOnto, mergeFrom, depth, field);
+                val = mergeField(mergeOnto, mergeFrom, depth, field, options);
             } catch (TieredAccessException e) {
                 String msg = "Failed to update field '%s' of class '%s'".formatted(
                     mergeOnto.getClass().getCanonicalName(),
@@ -79,7 +94,8 @@ public class ReflectionsUtil {
         return fields;
     }
 
-    private static <T> Object mergeField(T initial, T loaded, int depth, Field field) throws TieredAccessException {
+    private static <T> Object mergeField(T initial, T loaded, int depth, Field field, ReflectionsMergeOptions options)
+        throws TieredAccessException {
         Object initialFieldVal = null;
         try {
             initialFieldVal = field.get(initial);
@@ -99,13 +115,19 @@ public class ReflectionsUtil {
             } else if (isValueSimple(field.getType())) {
                 return loadedFieldVal;
             } else if (isMap(field.getType())) {
-                Map<Object, Object> map = new HashMap<>();
-                map.putAll((Map<?, ?>) initialFieldVal);
-                map.putAll((Map<?, ?>) loadedFieldVal);
-                return map;
+                try {
+                    return options.handleMap().handleMap(
+                        (Map<?, ?>) initialFieldVal,
+                        (Map<?, ?>) loadedFieldVal,
+                        depth,
+                        options);
+                } catch (AccessException e) {
+                    String msg = "Unable to merge field %s".formatted(field.getName());
+                    throw new TieredAccessException(msg, e);
+                }
             } else {
                 if (Modifier.isTransient(field.getModifiers())) return loadedFieldVal;
-                return mergeAllowSwap(initialFieldVal, loadedFieldVal, depth + 1);
+                return merge(initialFieldVal, loadedFieldVal, depth + 1, options);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -132,7 +154,7 @@ public class ReflectionsUtil {
         }
     }
 
-    private static class TieredAccessException extends AccessException {
+    public static class TieredAccessException extends AccessException {
 
         private final List<String> stackOfMsgs = new ArrayList<>();
 
@@ -155,4 +177,5 @@ public class ReflectionsUtil {
             return String.join(" Caused by:\n", stackOfMsgs);
         }
     }
+
 }
