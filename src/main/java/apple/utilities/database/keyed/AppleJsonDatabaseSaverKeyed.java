@@ -1,6 +1,5 @@
 package apple.utilities.database.keyed;
 
-import apple.utilities.database.SaveFileable;
 import apple.utilities.database.SaveFileableKeyed;
 import apple.utilities.request.AppleJsonToFile;
 import apple.utilities.request.AppleRequestService;
@@ -9,11 +8,11 @@ import apple.utilities.request.keyed.AppleRequestOnConflict;
 import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import apple.utilities.util.FileFormatting;
 import com.google.gson.Gson;
-
 import java.io.File;
 
 @Deprecated
 public interface AppleJsonDatabaseSaverKeyed<DBType extends SaveFileableKeyed> {
+
     Gson DEFAULT_GSON = new Gson();
 
     default AppleRequestService.RequestHandler<?> save(DBType saving) {
@@ -27,22 +26,22 @@ public interface AppleJsonDatabaseSaverKeyed<DBType extends SaveFileableKeyed> {
     default AppleRequestService.RequestHandler<?> delete(DBType saving, AppleRequestOnConflict<Boolean> onConflict) {
         File dbFile = FileFormatting.fileWithChildren(getDBFolder(), saving.getSaveFilePath());
         return getSavingService()
-                .queue(saving.getSaveId(),
-                       dbFile::delete,
-                       getSavingSettings(),
-                       onConflict
-                );
+            .queue(saving.getSaveId(),
+                dbFile::delete,
+                getSavingSettings(),
+                onConflict
+            );
     }
 
     default AppleRequestService.RequestHandler<?> save(DBType saving, AppleRequestOnConflict<Boolean> onConflict) {
         File dbFile = FileFormatting.fileWithChildren(getDBFolder(), saving.getSaveFilePath());
         return getSavingService()
-                .queue(saving.getSaveId(),
-                       new AppleJsonToFile(dbFile, saving)
-                               .withGson(getGson()),
-                       getSavingSettings(),
-                       onConflict
-                );
+            .queue(saving.getSaveId(),
+                new AppleJsonToFile(dbFile, saving)
+                    .withGson(getGson()),
+                getSavingSettings(),
+                onConflict
+            );
     }
 
     default Gson getGson() {

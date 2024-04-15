@@ -10,7 +10,9 @@ import java.io.Writer;
 public interface ConcurrentAJDSerializer {
 
     default <T> void serialize(T obj, File file) throws IOException {
-        serialize(obj, new FileWriter(file));
+        try (FileWriter writer = new FileWriter(file)) {
+            serialize(obj, writer);
+        }
     }
 
     default <T> String serialize(T obj) {

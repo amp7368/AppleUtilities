@@ -17,8 +17,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class ReflectionsUtil {
 
-    private static final Set<Class<?>> primitives = Set.of(String.class, Boolean.class, Character.class, Byte.class, Short.class,
-        Integer.class, Long.class, Float.class, Double.class, Collection.class);
+    private static final Set<Class<?>> PRIMITIVES = Set.of(String.class, Boolean.class, Character.class, Byte.class, Short.class,
+        Integer.class, Long.class, Float.class, Double.class);
 
     public static <T> T merge(Class<T> mergeOnto, T mergeFrom) throws AccessException {
         return merge(makeNew(mergeOnto), mergeFrom);
@@ -51,10 +51,7 @@ public class ReflectionsUtil {
         for (Field field : getFields(mergeOnto.getClass())) {
             if (isFieldIgnored(field)) continue;
             if (!field.trySetAccessible()) {
-                String msg = "Field '%s' of class '%s' is inaccessible for reflection %n".formatted(
-                    field.getName(),
-                    mergeOnto.getClass().getCanonicalName());
-                throw new TieredAccessException(msg);
+                return mergeFrom;
             }
             Object val;
             try {
@@ -83,7 +80,9 @@ public class ReflectionsUtil {
 
     private static boolean isFieldIgnored(Field field) {
         int fieldModifiers = field.getModifiers();
-        return Modifier.isStatic(fieldModifiers);//|| Modifier.isTransient(fieldModifiers);
+        // maybe don't have isTransient because you should still keep the fields with transient modifiers
+        // when deserializing and merging onto a newly created object?
+        return Modifier.isStatic(fieldModifiers); //|| Modifier.isTransient(fieldModifiers);
     }
 
     @NotNull
@@ -120,7 +119,7 @@ public class ReflectionsUtil {
                     String msg = "Unable to merge field %s".formatted(fieldName);
                     throw new TieredAccessException(msg, e);
                 }
-            } else if (isValueSimple(field.getType())) {
+            } else if (isTypeSimple(field.getType())) {
                 return loadedFieldVal;
             } else {
                 if (Modifier.isTransient(field.getModifiers())) return loadedFieldVal;
@@ -160,8 +159,12 @@ public class ReflectionsUtil {
         return fieldType == HashMap.class || fieldType == Map.class;
     }
 
-    private static boolean isValueSimple(Class<?> fieldType) {
-        return fieldType.isPrimitive() || primitives.stream().anyMatch((c) -> c.isAssignableFrom(fieldType));
+    public static boolean isTypeSimple(Class<?> fieldType) {
+        return isTypePrimitive(fieldType) || Collection.class.isAssignableFrom(fieldType);
+    }
+
+    public static boolean isTypePrimitive(Class<?> fieldType) {
+        return fieldType.isPrimitive() || PRIMITIVES.stream().anyMatch(p -> p.isAssignableFrom(fieldType));
     }
 
     public static <DBType> DBType makeNew(Class<DBType> type) {

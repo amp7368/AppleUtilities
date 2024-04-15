@@ -3,14 +3,15 @@ package apple.utilities.request;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 @Deprecated
 public class AppleJsonFromFile<Out> implements AppleRequest<Out> {
+
     private final File fileToSaveTo;
     private final Class<Out> getThis;
     private final Type getThisType;
@@ -36,7 +37,7 @@ public class AppleJsonFromFile<Out> implements AppleRequest<Out> {
     @Override
     public Out get() throws AppleRequestException {
         try (FileReader reader = new FileReader(fileToSaveTo)) {
-            return gson.fromJson(reader, getThis == null ? getThisType : getThis);
+            return gson.fromJson(reader, Objects.requireNonNullElse(getThis, getThisType));
         } catch (IOException | JsonIOException | JsonSyntaxException e) {
             throw new AppleRequest.AppleRequestException(fileToSaveTo.getAbsolutePath() + " had an IOException", e);
         }

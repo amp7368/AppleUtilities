@@ -13,7 +13,9 @@ public interface ConcurrentAJDDeserializer {
     default <T> T deserialize(File file, Class<T> type) throws IOException {
         if (!file.exists()) return null;
 
-        return deserialize(new FileReader(file), type);
+        try (FileReader reader = new FileReader(file)) {
+            return deserialize(reader, type);
+        }
     }
 
     <T> T deserialize(Reader reader, Class<T> type) throws IOException;

@@ -7,11 +7,11 @@ import apple.utilities.request.AppleRequestService;
 import apple.utilities.request.settings.RequestSettingsBuilderVoid;
 import apple.utilities.util.FileFormatting;
 import com.google.gson.Gson;
-
 import java.io.File;
 
 @Deprecated
 public interface AppleJsonDatabaseSaver<DBType extends HasFilename> {
+
     Gson DEFAULT_GSON = new Gson();
 
     static File getDBFolder(Class<?> mainClass) {
@@ -22,11 +22,10 @@ public interface AppleJsonDatabaseSaver<DBType extends HasFilename> {
         File dbFile = FileFormatting.fileWithChildren(getDBFolder(), saving.getSaveFilePath());
         dbFile.getParentFile().mkdirs();
         return getIOService()
-                .queueVoid(
-                        new AppleJsonToFile(dbFile, saving)
-                                .withGson(getGson())
-                        , getSavingSettings()
-                );
+            .queueVoid(
+                new AppleJsonToFile(dbFile, saving).withGson(getGson()),
+                getSavingSettings()
+            );
     }
 
     default Gson getGson() {

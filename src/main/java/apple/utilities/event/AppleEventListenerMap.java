@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 public class AppleEventListenerMap {
+
     private final Map<AppleEventType<?>, List<AppleListenerWrapper<?>>> map = new HashMap<>();
 
-    public <Event extends AppleEvent> void put(AppleEventType<Event> eventType, AppleListener<Event> listener, AppleListenerPriority priority) {
+    public <Event extends AppleEvent> void put(AppleEventType<Event> eventType, AppleListener<Event> listener,
+        AppleListenerPriority priority) {
         synchronized (map) {
             List<AppleListenerWrapper<?>> listeners = map.computeIfAbsent(eventType, (e) -> new ArrayList<>());
             listeners.add(new AppleListenerWrapper<>(listener, priority));
@@ -21,6 +23,7 @@ public class AppleEventListenerMap {
         if (listeners == null) return;
         for (AppleListenerWrapper<?> wrapperGeneric : listeners) {
             // this cast is okay because put() enforces this
+            @SuppressWarnings("unchecked")
             AppleListenerWrapper<Event> wrapper = (AppleListenerWrapper<Event>) wrapperGeneric;
             wrapper.listener().onEvent(event);
             if (event.isCanceled()) {
@@ -30,6 +33,7 @@ public class AppleEventListenerMap {
     }
 
     private record AppleListenerWrapper<Event>(AppleListener<Event> listener, AppleListenerPriority priority) {
+
         public int comparePriority(AppleListenerWrapper<?> other) {
             return this.priority.compare(other.priority);
         }

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public interface ConcurrentAJD {
 
     static <T> ConcurrentAJDInst<T> createInst(Class<T> dbType, File file) {
-        return createInst(dbType, file, null, Executors.newCachedThreadPool());
+        return createInst(dbType, file, null, ConcurrentAJDConfig.sharedAJDInst());
     }
 
     static <T> ConcurrentAJDInst<T> createInst(Class<T> dbType, File file, Executor executor) {
@@ -23,7 +23,7 @@ public interface ConcurrentAJD {
     }
 
     static <T> ConcurrentAJDInst<T> createInst(Class<T> dbType, File file, Gson gson) {
-        return createInst(dbType, file, gson, Executors.newCachedThreadPool());
+        return createInst(dbType, file, gson, ConcurrentAJDConfig.sharedAJDInst());
     }
 
     static <T> ConcurrentAJDInst<T> createInst(Class<T> dbType, File file, @Nullable Gson gson, Executor executor) {

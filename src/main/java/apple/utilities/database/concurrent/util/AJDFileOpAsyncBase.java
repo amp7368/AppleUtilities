@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class AJDFileOpAsyncBase<A, R> {
 
@@ -79,6 +80,17 @@ public class AJDFileOpAsyncBase<A, R> {
                 this.waitToStart = false;
                 this.notifyAll();
             }
+        }
+    }
+
+    public <T> T stop(Supplier<T> callback) {
+        synchronized (this) {
+            queuedArg = null;
+            queuedOp = null;
+            waitToStart();
+            queuedArg = null;
+            queuedOp = null;
+            return callback.get();
         }
     }
 

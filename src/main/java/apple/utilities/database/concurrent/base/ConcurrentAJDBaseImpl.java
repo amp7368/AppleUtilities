@@ -1,7 +1,9 @@
 package apple.utilities.database.concurrent.base;
 
+import apple.utilities.database.concurrent.ConcurrentAJDConfig;
 import apple.utilities.database.concurrent.serialize.ConcurrentAJDSerializing;
 import apple.utilities.database.util.ReflectionsUtil;
+import apple.utilities.threading.cached.LayeredDelegatingExecutor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,14 +12,15 @@ import java.util.concurrent.Executor;
 
 public class ConcurrentAJDBaseImpl<DBType> implements ConcurrentAJDBase<DBType> {
 
-    protected final Executor executor;
     protected final Class<DBType> dbType;
-
     protected ConcurrentAJDSerializing serializing;
+    protected final Executor executor;
 
     public ConcurrentAJDBaseImpl(Class<DBType> dbType, Executor executor) {
         this.dbType = dbType;
-        this.executor = executor;
+        // A LayeredDelegatingExecutor will use L1_CACHE as a layer before possibly creating threads in executor
+        // Sharing a common L1_CACHE will remove the overhead of thread creation for ConcurrentAJD's that don't save or load frequently
+        this.executor = new LayeredDelegatingExecutor(executor, ConcurrentAJDConfig.l1Cache());
         this.serializing = new ConcurrentAJDSerializing();
     }
 

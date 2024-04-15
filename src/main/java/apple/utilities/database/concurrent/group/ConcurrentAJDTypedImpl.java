@@ -42,7 +42,8 @@ public class ConcurrentAJDTypedImpl<DBType extends HasFilename> extends Concurre
 
     @Override
     public boolean delete(DBType deleteThis) {
-        return deleteThis.fileWithParent(folder).delete();
+        File file = deleteThis.fileWithParent(folder);
+        return computeTakeLastOp(file).stop(file::delete);
     }
 
     @Override

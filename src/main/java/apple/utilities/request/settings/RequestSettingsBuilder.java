@@ -3,13 +3,13 @@ package apple.utilities.request.settings;
 import apple.utilities.request.ExceptionHandler;
 import apple.utilities.request.RequestLogger;
 import apple.utilities.structures.Pair;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 @Deprecated
 public class RequestSettingsBuilder<T> {
+
     private List<Pair<ExceptionHandler, Integer>> exceptionHandler = new ArrayList<>();
     private RequestLogger<T> requestLogger = RequestLogger.empty();
 
@@ -42,7 +42,7 @@ public class RequestSettingsBuilder<T> {
 
     public RequestSettingsBuilder<T> addRequestLogger(RequestLogger<T> requestLogger) {
         RequestLogger<T> oldLogger = this.requestLogger;
-        this.requestLogger = new RequestLogger<T>() {
+        this.requestLogger = new RequestLogger<>() {
             @Override
             public void startRequest() {
                 oldLogger.startRequest();

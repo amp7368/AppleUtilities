@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
 public class ConcurrentAJDInstImpl<DBType> extends ConcurrentAJDBaseImpl<DBType> implements ConcurrentAJDInst<DBType> {
 
     protected final File file;
-    private final AJDFileOpAsync saveOp;
     protected DBType thing = null;
+    private final AJDFileOpAsync saveOp;
 
     public ConcurrentAJDInstImpl(Class<DBType> dbType, File file, Executor executor) {
         super(dbType, executor);

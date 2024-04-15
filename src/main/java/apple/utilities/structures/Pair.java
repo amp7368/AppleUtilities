@@ -3,6 +3,7 @@ package apple.utilities.structures;
 import java.util.Objects;
 
 public class Pair<K, V> {
+
     private K key;
     private V value;
 
@@ -39,7 +40,7 @@ public class Pair<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Pair p) {
+        if (obj instanceof Pair<?, ?> p) {
             return p.getKey().equals(key) && p.getValue().equals(value);
         }
         return false;
