@@ -1,6 +1,8 @@
 package apple.utilities.structures.expressions;
 
+@Deprecated
 public interface BooleanExpressionApple<T> {
+
     boolean decide(T arg);
 
     default BooleanExpressionApple<T> and(BooleanExpressionApple<T> other) {

@@ -1,6 +1,8 @@
 package apple.utilities.structures.expressions;
 
+@Deprecated
 public abstract class EnumJoinedExpressionContains<EnumType> extends EnumJoinedExpressionImpl<EnumType> {
+
     public static <EnumType> boolean contains12(EnumType[] enums1, EnumType[] enums2) {
         for (EnumType e1 : enums1) {
             boolean fail = true;

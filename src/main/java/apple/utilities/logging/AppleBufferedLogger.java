@@ -3,7 +3,9 @@ package apple.utilities.logging;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public abstract class AppleBufferedLogger implements AppleLoggerName {
+
     private final List<LogMessage> messages = new ArrayList<>();
 
     @Override

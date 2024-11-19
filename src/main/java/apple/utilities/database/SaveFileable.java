@@ -2,6 +2,7 @@ package apple.utilities.database;
 
 import apple.utilities.util.FileFormatting;
 
+@Deprecated
 public interface SaveFileable extends HasFilename, FileFormatting {
 
     default String extension(String file, String extension) {

@@ -1,13 +1,14 @@
 package apple.utilities.structures;
 
 import apple.utilities.lamdas.ObjectSupplier;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class StringFormattedBuilder {
+
     private final List<Pair<Integer, String>> stringMatched;
     private final String string;
     private final ObjectSupplier[] argsSupplier;
@@ -16,10 +17,10 @@ public class StringFormattedBuilder {
         this.string = string.replace("%", "%%");
         this.argsSupplier = argsSupplier;
         this.stringMatched = Pattern.compile("[{][0-9]*[}]")
-                .matcher(this.string).results()
-                .map(m -> new Pair<>(m.start(), m.group()))
-                .sorted(Comparator.comparingInt(Pair::getKey))
-                .collect(Collectors.toList());
+            .matcher(this.string).results()
+            .map(m -> new Pair<>(m.start(), m.group()))
+            .sorted(Comparator.comparingInt(Pair::getKey))
+            .collect(Collectors.toList());
     }
 
     public String getString() {

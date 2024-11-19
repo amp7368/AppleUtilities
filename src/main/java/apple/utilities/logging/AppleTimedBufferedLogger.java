@@ -1,8 +1,10 @@
 package apple.utilities.logging;
 
+@Deprecated
 public abstract class AppleTimedBufferedLogger extends AppleBufferedLogger {
+
+    private final long sleepTime;
     private boolean isRunning = false;
-    private long sleepTime;
 
     protected AppleTimedBufferedLogger(long sleepTime) {
         this.sleepTime = sleepTime;

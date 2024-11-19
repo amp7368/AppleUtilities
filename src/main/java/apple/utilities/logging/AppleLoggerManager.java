@@ -1,15 +1,16 @@
 package apple.utilities.logging;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
+@Deprecated
 public class AppleLoggerManager {
+
     private final HashMap<AppleLoggerName, Logger> loggers = new HashMap<>();
     private final HashMap<Level, List<AppleLoggerName>> catchAll = new HashMap<>();
 

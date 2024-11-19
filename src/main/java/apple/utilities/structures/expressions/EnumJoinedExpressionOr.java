@@ -1,6 +1,8 @@
 package apple.utilities.structures.expressions;
 
+@Deprecated
 public abstract class EnumJoinedExpressionOr<EnumType> extends EnumJoinedExpressionImpl<EnumType> {
+
     public static <EnumType> boolean isValidOr(EnumType[] enums1, EnumType[] enums2) {
         for (EnumType e1 : enums1) {
             for (EnumType e2 : enums2) {

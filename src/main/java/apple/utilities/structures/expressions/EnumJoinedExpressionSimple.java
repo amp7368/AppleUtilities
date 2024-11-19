@@ -1,6 +1,8 @@
 package apple.utilities.structures.expressions;
 
+@Deprecated
 public abstract class EnumJoinedExpressionSimple<EnumType> extends EnumJoinedExpressionImpl<EnumType> {
+
     private EnumOperatorType operator;
 
     public EnumJoinedExpressionSimple(EnumOperatorType operator) {

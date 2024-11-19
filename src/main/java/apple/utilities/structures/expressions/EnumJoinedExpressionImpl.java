@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.function.IntFunction;
 
+@Deprecated
 public abstract class EnumJoinedExpressionImpl<Enum> implements EnumJoinedExpression<Enum> {
+
     private HashSet<Enum> myEnums = new HashSet<>();
 
     @Override

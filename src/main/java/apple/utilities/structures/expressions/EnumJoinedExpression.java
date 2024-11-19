@@ -2,7 +2,9 @@ package apple.utilities.structures.expressions;
 
 import java.util.Collection;
 
+@Deprecated
 public interface EnumJoinedExpression<EnumType> {
+
     boolean operate(EnumType[] enums);
 
     EnumType[] getMyEnums();

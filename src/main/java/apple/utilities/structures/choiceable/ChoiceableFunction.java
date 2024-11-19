@@ -2,6 +2,14 @@ package apple.utilities.structures.choiceable;
 
 import java.util.function.Function;
 
+/**
+ * replace with java.util.Optional#map
+ *
+ * @param <Give>
+ * @param <Thing>
+ * @see java.util.Optional#map(Function)
+ */
+@Deprecated
 public class ChoiceableFunction<Give, Thing> {
 
     Function<Give, Thing> supplier;

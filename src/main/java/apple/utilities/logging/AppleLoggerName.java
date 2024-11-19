@@ -2,7 +2,9 @@ package apple.utilities.logging;
 
 import org.slf4j.event.Level;
 
+@Deprecated
 public interface AppleLoggerName {
+
     String getLoggerName();
 
     default Level[] getWatchLevels() {
