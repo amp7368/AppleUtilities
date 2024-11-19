@@ -1,6 +1,6 @@
 package apple.utilities.database.concurrent.group;
 
-import apple.utilities.database.HasFilename;
+import apple.utilities.database.HasFilenameConverter;
 import apple.utilities.database.concurrent.base.ConcurrentAJDBaseImpl;
 import apple.utilities.database.concurrent.util.AJDFileOpAsync;
 import apple.utilities.util.FileFormatting;
@@ -17,32 +17,50 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import org.jetbrains.annotations.NotNull;
 
-public class ConcurrentAJDTypedImpl<DBType extends HasFilename> extends ConcurrentAJDBaseImpl<DBType> implements
-    ConcurrentAJDTyped<DBType> {
+public class ConcurrentAJDTypedImpl<DBType> extends ConcurrentAJDBaseImpl<DBType> implements ConcurrentAJDTyped<DBType> {
 
-    protected final File folder;
-
+    protected final File rootFolder;
     protected final Map<String, AJDFileOpAsync> saveOp = new HashMap<>();
+    private final HasFilenameConverter<DBType> filenameConverter;
 
-    public ConcurrentAJDTypedImpl(Class<DBType> dbType, File folder, Executor executor) {
+    public ConcurrentAJDTypedImpl(Class<DBType> dbType, File rootFolder,
+        HasFilenameConverter<DBType> filenameConverter, Executor executor) {
         super(dbType, executor);
-        this.folder = folder;
+        this.rootFolder = rootFolder;
+        this.filenameConverter = filenameConverter;
+        this.rootFolder.mkdirs();
     }
 
     @NotNull
     private AJDFileOpAsync computeTakeLastOp(DBType saveThis) {
-        return computeTakeLastOp(saveThis.fileWithParent(folder));
+        return computeTakeLastOp(getFilename(saveThis));
     }
 
     @NotNull
     private AJDFileOpAsync computeTakeLastOp(File file) {
         String key = file.getAbsolutePath();
-        return saveOp.computeIfAbsent(key, k -> new AJDFileOpAsync(s -> writeToFile(file, s), executor));
+        synchronized (saveOp) {
+            return saveOp.computeIfAbsent(key, k -> new AJDFileOpAsync(s -> writeToFile(file, s), executor));
+        }
+    }
+
+    @Override
+    public HasFilenameConverter<DBType> getFilenameConverter() {
+        return filenameConverter;
+    }
+
+    @Override
+    public File getFilename(DBType saveThis) {
+        File file = filenameConverter.fileWithParent(saveThis, rootFolder);
+        File folder = file.getParentFile();
+        if (!Objects.equals(folder, rootFolder))
+            folder.mkdirs();
+        return file;
     }
 
     @Override
     public boolean delete(DBType deleteThis) {
-        File file = deleteThis.fileWithParent(folder);
+        File file = getFilename(deleteThis);
         return computeTakeLastOp(file).stop(file::delete);
     }
 
@@ -65,7 +83,7 @@ public class ConcurrentAJDTypedImpl<DBType extends HasFilename> extends Concurre
 
     @Override
     public CompletableFuture<Collection<DBType>> loadFolder(boolean safeMode) {
-        File[] files = folder.listFiles();
+        File[] files = rootFolder.listFiles();
         if (files == null) return CompletableFuture.completedFuture(Collections.emptyList());
         List<CompletableFuture<DBType>> loadFolder = Arrays.stream(files).map((file) -> this.loadOne(safeMode, file)).toList();
         CompletableFuture<?>[] futures = loadFolder.toArray(CompletableFuture<?>[]::new);
@@ -85,7 +103,7 @@ public class ConcurrentAJDTypedImpl<DBType extends HasFilename> extends Concurre
 
     @Override
     public CompletableFuture<DBType> loadOne(boolean safeMode, String... children) {
-        File file = FileFormatting.fileWithChildren(this.folder, children);
+        File file = FileFormatting.fileWithChildren(this.rootFolder, children);
         return loadOne(safeMode, file);
     }
 
@@ -102,7 +120,7 @@ public class ConcurrentAJDTypedImpl<DBType extends HasFilename> extends Concurre
 
     @Override
     public DBType loadOneNow(boolean safeMode, String... children) {
-        File file = FileFormatting.fileWithChildren(this.folder, children);
+        File file = FileFormatting.fileWithChildren(this.rootFolder, children);
         return loadOneNow(safeMode, file);
     }
 }

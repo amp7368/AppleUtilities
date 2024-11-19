@@ -1,13 +1,17 @@
 package apple.utilities.database.concurrent.group;
 
-import apple.utilities.database.HasFilename;
+import apple.utilities.database.HasFilenameConverter;
 import apple.utilities.database.concurrent.base.ConcurrentAJDBase;
 import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public interface ConcurrentAJDTyped<DBType extends HasFilename> extends ConcurrentAJDBase<DBType> {
+public interface ConcurrentAJDTyped<DBType> extends ConcurrentAJDBase<DBType> {
+
+    HasFilenameConverter<DBType> getFilenameConverter();
+
+    File getFilename(DBType saveThis);
 
     boolean delete(DBType deleteThis);
 
